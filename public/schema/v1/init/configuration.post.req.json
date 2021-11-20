@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /init/configuration",
+  "type": "object",
+  "properties": {
+    "client": {
+      "type": "object",
+      "description": "Initial client for http-basic authentication",
+      "properties": {
+        "id": {
+          "$ref": "{baseUrl}/public/schema/v1/admin/clients/common.json#/definitions/ClientId",
+          "description": "The client identifier"
+        },
+        "secret": {
+          "$ref": "{baseUrl}/public/schema/v1/admin/clients/common.json#/definitions/ClientSecret",
+          "description": "The secret for authentication"
+        }
+      },
+      "required": [
+        "id",
+        "secret"
+      ],
+      "additionalProperties": false
+    },
+    "admin": {
+      "type": "object",
+      "description": "Administrator user definition",
+      "properties": {
+        "username": {
+          "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Username",
+          "description": "Username"
+        },
+        "password": {
+          "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Password",
+          "description": "Password"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "client",
+    "admin"
+  ],
+  "additionalProperties": false
+}

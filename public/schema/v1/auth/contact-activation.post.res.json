@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/auth/contact-activation",
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "string",
+      "description": "The result of trust operation",
+      "enum": [
+        "TRUSTED",
+        "NOT_TRUSTED"
+      ]
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "additionalProperties": false
+}

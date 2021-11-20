@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/users",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "User identifier"
+    },
+    "username": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Username",
+      "description": "Username"
+    },
+    "userInfo": {
+      "description": "User information",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ContactType"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^.+$",
+                "description": "Contact information"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief text that describes the contact"
+              },
+              "trusted": {
+                "type": "boolean",
+                "description": "Defines if the contact is trusted"
+              }
+            },
+            "required": [
+              "type", "value", "trusted"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "firstName",
+        "lastName",
+        "contacts"
+      ],
+      "additionalProperties": false
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation registration date"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation last update date"
+    }
+  },
+  "required": [
+    "id",
+    "username",
+    "userInfo",
+    "registeredAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

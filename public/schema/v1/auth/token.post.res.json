@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/auth/token",
+  "type": "object",
+  "properties": {
+    "tokenType": {
+      "type": "string",
+      "pattern": "^bearer$",
+      "description": "Indicates the type of the access token"
+    },
+    "accessToken": {
+      "$ref": "{baseUrl}/public/schema/v1/auth/common.json#/definitions/AccessToken",
+      "description": "Token that authenticates every secured route"
+    },
+    "expiresIn": {
+      "type": "integer",
+      "description": "Indicates the token validity time expressed in minutes"
+    },
+    "refreshToken": {
+      "$ref": "{baseUrl}/public/schema/v1/auth/common.json#/definitions/RefreshToken",
+      "description": "Token for obtaining new access token without user credentials"
+    }
+  },
+  "required": [
+    "tokenType",
+    "accessToken",
+    "expiresIn",
+    "refreshToken"
+  ],
+  "additionalProperties": false
+}

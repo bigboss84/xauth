@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Common data types",
+  "definitions": {
+    "Uuid": {
+      "description": "Universal Unique Identifier",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "Username": {
+      "description": "Username",
+      "type": "string",
+      "format": "email"
+    },
+    "Password": {
+      "description": "Password",
+      "type": "string",
+      "pattern": "^(?=(.*\\d){3,})(?=(.*[a-z]){3,})(?=.*[A-Z])(?=.*[@#$%^&+=-_.:])(?=\\S+$).{8,}$"
+    },
+    "AuthRole": {
+      "description": "Defines the user roles",
+      "type": "string",
+      "enum": [
+        "ADMIN",
+        "HR",
+        "HD_OPERATOR",
+        "RESPONSIBLE",
+        "USER"
+      ]
+    },
+    "AuthRoleName": {
+      "description": "Defines the authentication role name",
+      "type": "string",
+      "pattern": "^(?!_)([A-Z]+|(_(?!_)))+(?<!_)$"
+    },
+    "AuthStatus": {
+      "description": "Defines the user statuses",
+      "type": "string",
+      "enum": [
+        "DISABLED",
+        "ENABLED",
+        "BLOCKED"
+      ]
+    },
+    "AccessType": {
+      "description": "Defines the access type",
+      "type": "string",
+      "enum": [
+        "USER",
+        "APPLICATION"
+      ]
+    },
+    "UserType": {
+      "description": "Defines the user type",
+      "type": "string",
+      "enum": [
+        "FORMER_EMPLOYEE",
+        "BLUE_COLLAR"
+      ]
+    },
+    "ContactType": {
+      "description": "Defines the access type",
+      "type": "string",
+      "enum": [
+        "EMAIL",
+        "MOBILE_NUMBER"
+      ]
+    },
+    "UserInfo": {
+      "description": "User information",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "#/definitions/ContactType"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^.+$",
+                "description": "Contact information"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief text that describes the contact"
+              }
+            },
+            "required": [
+              "type", "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contacts"
+      ],
+      "additionalProperties": false
+    },
+    "Application": {
+      "description": "Defines the application",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ApplicationName"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApplicationPermission"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "permissions"
+      ]
+    },
+    "ApplicationName": {
+      "description": "Defines the application name",
+      "type": "string",
+      "patternBak": "^(?!_)([A-Z]+|(_(?!_)))+(?<!_)$"
+    },
+    "ApplicationPermission": {
+      "description": "Defines the application permissions",
+      "type": "string",
+      "enum": [
+        "OWNER",
+        "READ",
+        "WRITE"
+      ]
+    }
+  }
+}

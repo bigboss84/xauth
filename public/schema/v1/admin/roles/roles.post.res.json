@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/admin/roles",
+  "type": "object",
+  "properties": {
+    "roles": {
+      "type": "array",
+      "items": {
+        "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/AuthRoleName"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "roles"
+  ],
+  "additionalProperties": false
+}

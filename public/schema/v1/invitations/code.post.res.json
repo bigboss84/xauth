@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/invitations/{id}/code",
+  "type": "object",
+  "properties": {
+    "invitationCode": {
+      "$ref": "{baseUrl}/public/schema/v1/invitations/common.json#/definitions/InvitationCode",
+      "description": "Invitation code that refers to pre-registered user"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Expiration date for invitation code"
+    }
+  },
+  "additionalProperties": false
+}

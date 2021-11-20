@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Common client data types",
+  "definitions": {
+    "ClientId": {
+      "description": "Defines the client id format",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{8,30}[a-z0-9]$",
+      "minLength": 10,
+      "maxLength": 32
+    },
+    "ClientSecret": {
+      "description": "Defines the client secret format",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{8,30}[a-z0-9]$",
+      "minLength": 10,
+      "maxLength": 32
+    }
+  }
+}

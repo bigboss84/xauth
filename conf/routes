@@ -1,0 +1,70 @@
+# Application home page
+GET         /                                    io.xauth.web.controller.HomeController.index
+
+# Init
+POST        /v1/init/configuration               io.xauth.web.controller.init.InitController.configuration
+
+# Health
+GET         /v1/health                           io.xauth.web.controller.health.HealthController.health
+
+# Admin
+POST        /v1/admin/users                      io.xauth.web.controller.admin.users.AdminUserController.create
+GET         /v1/admin/users/:id                  io.xauth.web.controller.admin.users.AdminUserController.find(id: io.xauth.Uuid)
+POST        /v1/admin/users/:id/unblock          io.xauth.web.controller.admin.users.AdminUserController.unblock(id: io.xauth.Uuid)
+PATCH       /v1/admin/users/:id/roles            io.xauth.web.controller.admin.users.AdminUserController.patchRoles(id: io.xauth.Uuid)
+PATCH       /v1/admin/users/:id/status           io.xauth.web.controller.admin.users.AdminUserController.patchStatus(id: io.xauth.Uuid)
+POST        /v1/admin/account-trust              io.xauth.web.controller.admin.users.AdminUserController.accountTrust
+POST        /v1/admin/clients                    io.xauth.web.controller.admin.clients.AdminClientController.create
+GET         /v1/admin/clients                    io.xauth.web.controller.admin.clients.AdminClientController.findAll
+GET         /v1/admin/clients/:id                io.xauth.web.controller.admin.clients.AdminClientController.find(id: String)
+PUT         /v1/admin/clients/:id                io.xauth.web.controller.admin.clients.AdminClientController.update(id: String)
+DELETE      /v1/admin/clients/:id                io.xauth.web.controller.admin.clients.AdminClientController.delete(id: String)
+GET         /v1/admin/applications               io.xauth.web.controller.admin.applications.AdminApplicationController.findAll
+PATCH       /v1/admin/applications               io.xauth.web.controller.admin.applications.AdminApplicationController.patch
+
+# System Applications
+GET         /v1/applications                     io.xauth.web.controller.applications.ApplicationController.findAll
+
+# Owner
+PATCH       /v1/owner/users/:id/applications     io.xauth.web.controller.owner.users.UserApplicationController.patchApplications(id: io.xauth.Uuid)
+
+# Invitation
+POST        /v1/invitations                      io.xauth.web.controller.invitations.InvitationController.create
+POST        /v1/invitations/:id/code             io.xauth.web.controller.invitations.InvitationController.createCode(id: io.xauth.Uuid)
+GET         /v1/invitations                      io.xauth.web.controller.invitations.InvitationController.findAll
+GET         /v1/invitations/:id                  io.xauth.web.controller.invitations.InvitationController.find(id: io.xauth.Uuid)
+DELETE      /v1/invitations/:id                  io.xauth.web.controller.invitations.InvitationController.delete(id: io.xauth.Uuid)
+
+# User
+POST        /v1/users                            io.xauth.web.controller.users.UserController.create
+GET         /v1/users/:id                        io.xauth.web.controller.users.UserController.find(id: io.xauth.Uuid)
+DELETE      /v1/users/:id                        io.xauth.web.controller.users.UserController.delete(id: io.xauth.Uuid)
+
+# Authentication
+## basic authentication by trusted client
+GET         /v1/auth/jwk                         io.xauth.web.controller.auth.AuthController.jwk
+POST        /v1/auth/token                       io.xauth.web.controller.auth.AuthController.token
+GET         /v1/auth/check                       io.xauth.web.controller.auth.AuthController.check
+POST        /v1/auth/refresh                     io.xauth.web.controller.auth.AuthController.refresh
+
+# reset password
+POST        /v1/auth/password-forgotten          io.xauth.web.controller.auth.AuthController.passwordForgotten
+POST        /v1/auth/password-reset              io.xauth.web.controller.auth.AuthController.passwordReset
+POST        /v1/auth/account-delete-request      io.xauth.web.controller.auth.AuthController.accountDeleteRequest
+POST        /v1/auth/account-delete-confirmation io.xauth.web.controller.auth.AuthController.accountDeleteConfirmation
+
+## token authentication
+GET         /v1/auth/user                        io.xauth.web.controller.auth.AuthController.user
+POST        /v1/auth/contact-trust               io.xauth.web.controller.auth.AuthController.contactTrust
+POST        /v1/auth/contact-activation          io.xauth.web.controller.auth.AuthController.contactActivation
+
+## no authentication
+POST        /v1/auth/activation                  io.xauth.web.controller.auth.AuthController.activation
+
+POST        /test                                io.xauth.web.controller.TestController.test
+
+# Json-Schemas
+GET         /public/schema/$path<.*>             io.xauth.web.controller.schema.JsonSchemaController.find(path: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)

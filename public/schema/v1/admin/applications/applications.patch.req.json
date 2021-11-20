@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "PATCH /v1/admin/applications",
+  "type": "object",
+  "properties": {
+    "applications": {
+      "type": "array",
+      "items": {
+        "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ApplicationName",
+        "description": "System applications to patch"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "applications"
+  ],
+  "additionalProperties": false
+}

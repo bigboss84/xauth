@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/admin/users",
+  "type": "object",
+  "properties": {
+    "password": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Password",
+      "description": "Password"
+    },
+    "passwordCheck": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Password",
+      "description": "Password"
+    },
+    "description": {
+      "type": "string",
+      "description": "Account description"
+    },
+    "userInfo": {
+      "description": "User information",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ContactType"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^.+$",
+                "description": "Contact information"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief text that describes the contact"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "firstName",
+        "lastName",
+        "contacts"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "password",
+    "passwordCheck",
+    "userInfo"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/auth/contact-trust",
+  "type": "object",
+  "properties": {
+    "contact": {
+      "type": "string",
+      "pattern": "^.+$",
+      "description": "Contact to trust"
+    }
+  },
+  "required": [
+    "contact"
+  ],
+  "additionalProperties": false
+}

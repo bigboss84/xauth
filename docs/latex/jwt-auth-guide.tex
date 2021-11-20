@@ -1,0 +1,413 @@
+% !TEX encoding = UTF-8
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\begin{document}
+\title{\textbf{jwt-auth}\\ \textsc{guida di base al sistema di autenticazione}}
+\author{enrico russo}
+\date{21 Maggio 2019 \\ \phantom{} versione 1.1}
+
+\maketitle
+
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+Il presente documento fa riferimento alla collezione di API REST in formato Postman, pertanto al fine di semplificare questa guida verranno omesse tutte le informazioni tecniche riguardanti le intestazioni HTTP e le modalità di interscambio delle informazioni con il servizio.\\
+
+Ulteriori informazioni sono reperibili dal file README.md:\\
+\href{}{https://gitlab.xauth.com/digital-products/jwt-auth/blob/master/README.md}
+
+\section{Inizializzazione}
+Subito dopo il primo deploy l'applicazione deve essere inizializzata per poter essere utilizzata, l'unico endpoint attivo in questo momento è il seguente:\\
+\\
+\texttt{>> ANON POST /v1/init/configuration}
+
+\begin{lstlisting}
+{
+  "client": {
+    "id": "trusted-client",
+    "secret": "trusted-client"
+  },
+  "admin": {
+    "username": "admin@xauth.com",
+    "password": "MyWonderfulPassword123"
+  }
+}
+\end{lstlisting}
+\texttt{<< 200 OK} \\
+
+Nello specifico la chiamata di inizializzazione consente di rendere configurabile quindi utilizzabile il sistema di autenticazione.
+
+Una volta eseguita con successo la richiesta a questo endpoint, 
+l'applicazione potrà quindi essere amministrata dall'utente amministratore specificato nell'oggetto \texttt{admin}, riassumendo:
+\begin{itemize}
+	\item il sistema ora riconosce come \textit{trusted} il client appena creato, ciò vuol dire che tutti gli endpoint protetti da \textit{HTTP Basic Authentication} potranno essere raggiunti con richieste autenticate con le credenziali definite in \texttt{client.id} e \texttt{client.secret};
+	\item il sistema ora ha un unico utente amministratore con ruoli \texttt{USER} e \texttt{ADMIN}, per ora basti pensare che tale utente può autenticarsi e amministrare. 
+\end{itemize}
+
+Nella sezione relativa ai ruoli di accesso tratteremo esaustivamente il concetto di ruolo che vedremo essere legato al sistema di autenticazione stesso e al controllo di sicurezza degli endpoint che espone.
+
+\section{Prima autenticazione}
+\label{stauth}
+Ora l'utente amministratore di piattaforma (con ruolo di \texttt{ADMIN}) può autenticarsi inviando una richiesta come la seguente: \\
+\\
+\texttt{>> BASIC POST /v1/auth/token}
+
+\begin{lstlisting}
+{
+  "username": "admin@xauth.com",
+  "password": "MyWonderfulPassword123"
+}
+\end{lstlisting}
+\texttt{<< 200 OK} \\
+
+Il sistema risponde alla richiesta di autenticazione con un oggetto JSON che contiene il token di accesso che può essere utilizzato per <<dialogare>> con il sistema \textit{in qualità di amministratore}.\\
+
+L'utente può dunque procedere con la creazione del primo utente al quale può anche assegnare degli specifici ruoli.
+
+\section{Creazione utenti}
+\label{mkusr}
+L'utente amministratore di piattaforma (con ruolo \texttt{ADMIN}) può autenticarsi e creare nuovi utenti dal seguente endpoint: \\
+\\
+\texttt{>> ADMIN POST /v1/auth/token}
+
+\begin{lstlisting}
+{
+  "password": "MyWonderfulPassword123",
+  "passwordCheck": "MyWonderfulPassword123",
+  "description": "default help desk operator user",
+  "userInfo": {
+    "firstName": "Help",
+    "lastName": "Desk",
+    "contacts": [
+      {
+        "type": "EMAIL",
+        "value": "helpdesk@xauth.com"
+      }
+    ]
+  }
+}
+\end{lstlisting}
+\texttt{<< 201 CREATED} \\
+
+L’utente di supporto appena creato è un semplice utente non ancora abilitato ad effettuare l’accesso e dovrà quindi confermare la registrazione con il codice di accesso che il sistema avrà inviato al contatto fornito dall’amministratore. \\
+
+Prima di procedere con l’assegnazione dei ruoli procediamo dunque ad attivare la registrazione dell’utente di supporto. \\
+
+\textbf{Nota:} L’amministratore di piattaforma può effettuare l’attivazione dell’utente appena creato da un apposito endpoint e velocizzare così la procedura di attivazione del nuovo account.
+
+
+\section{Attivazione account}
+
+Con la seguente richiesta possiamo dunque effettuare l’attivazione dell’utente appena creato inviando il codice di attivazione notificato.
+
+Il sistema riconoscerà il codice come un codice di attivazione che farà riferimento all’utente da attivare, effettuerà l’attivazione ed eliminerà tale codice dal sistema. \\
+\\
+\texttt{>> ANON POST /v1/auth/activation}
+\begin{lstlisting}
+{
+  "code": "kZVe9IQy53eG9ggXbeMWRiwf6fM5o4vV"
+}
+\end{lstlisting}
+\texttt{<< 200 OK} \\
+
+A questo punto il sistema ha cambiato lo stato dell’utente in \texttt{ENABLED} e ha reso trusted il contatto fornito al momento della registrazione.
+
+L’utente può ora autenticarsi ed ottenere un token di accesso.
+
+
+\section{Assegnazione dei ruoli}
+L’amministratore di piattaforma (con ruolo \texttt{ADMIN}) può modificare i ruoli di qualsiasi utente con la seguente richiesta: \\
+\\
+\texttt{>> ADMIN PATCH /admin/users/c7cd0b9c-...-a7b5-3acd2f0b0811/roles}
+\begin{lstlisting}
+{
+  "roles": [
+    "HD_OPERATOR",
+    "USER"
+  ]
+}
+\end{lstlisting}
+\texttt{<< 200 OK} \\
+
+Si noti che questo endpoint aggiorna la collezione dei ruoli dell’utente identificato dal suo UUID ottenuto peraltro dal body della risposta alla richiesta della registrazione. \\
+
+La situazione attuale si può riassumere dal fatto che l’amministratore di sistema ha inizializzato l’applicazione e ne ha preso il controllo, ha successivamente registrato un utente e ne ha modificato il suo livello di accesso.\\
+\\
+\begin{center}
+	\texttt{ADMIN} \\
+	\downarrow \\
+	\texttt{HD\_OPERATOR}
+\end{center}
+
+A questo punto risulta chiaro come l’amministratore possa anche effettuare la registrazione di altri utenti e modificarne i ruoli creando ad esempio un altro utente con un ruolo più basso di \texttt{HD\_OPERATOR} come quello di \texttt{RESPONSIBLE}. \\
+
+Assumiamo dunque che a questo punto che la situazione sia la seguente:
+\begin{center}
+	\texttt{ADMIN} \\
+	\downarrow \\
+	\texttt{HD\_OPERATOR} \\
+	\downarrow \\
+	\texttt{RESPONSIBLE}
+\end{center}
+
+Discuteremo approfonditamente in una sezione a parte i significati dei ruoli e come questi ultimi sono stati concepiti anche in relazione al concetto di \textit{application}.
+
+\section{Applicazioni e livelli di accessibilità}
+Al fine di migliorare l'integrazione in un ecosistema, il sistema definisce il concetto di \textit{application} come un contesto nel quale si possono definire diversi livelli di accessibilità che in questo caso chiameremo \textit{permission}.
+
+Tali contesti detti anche <<contesti applicativi>> sono del tutto sganciati dal sistema di autenticazione e il loro scopo è solo quello di permettere ad un client esterno e facente parte dell'ecosistema di avere informazioni circa gli ambiti e le modalità di accesso di uno specifico utente.\\
+
+Come vedremo le informazioni relative alle \textit{application} saranno memorizzate nel payload del token di accesso erogato in fase di autenticazione.
+
+\subsection{Definire l'insieme delle applicazioni}
+L'utente amministratore (con ruolo \texttt{ADMIN}) può definire l'insieme dei <<contesti applicativi>> che il sistema riconosce e per i quali sarà possibile - a livello utente - assegnare delle restrizioni di accesso mediante una o più \textit{permission}.	
+
+Le \textit{permission} riconosciute dal sistema sono: \texttt{OWNER}, \texttt{READ} e \texttt{WRITE}. \\
+
+È possibile ottenere l'elenco delle \textit{application} configurate dal seguente endpoint:\\
+\\
+\texttt{>> ADMIN GET /v1/admin/applications}\\
+\texttt{<< 200 OK}
+\begin{lstlisting}
+{
+  "applications": [
+  ]
+}
+\end{lstlisting} \\
+
+La modifica delle \textit{application} è possibile inviando il nuovo elenco con una richiesta all'\textit{endpoint} seguente:\\
+\\
+\texttt{>> ADMIN PATCH /v1/admin/applications}
+\begin{lstlisting}
+{
+  "applications": [
+    "PAIRING",
+    "TRACKING_LABEL_CYBER"
+  ]
+}
+\end{lstlisting}
+\texttt{<< 200 OK}
+
+\subsection{Definizione dei livelli di accessibilità}
+Una volta noti i contesti applicativi riconosciuti dal sistema possiamo identificare con la seguente struttura i livelli di accessibilità per una determinata applicazione: \\
+
+\begin{lstlisting}
+{
+  "name": "PAIRING",
+  "permissions": [
+    "READ"
+  ]
+}
+\end{lstlisting}
+
+
+la chiave \texttt{name} rappresenta il nome del contesto applicativo o \textit{application} e la collezione identificata dalla chiave \texttt{permissions} un semplice elenco di stringhe auto-esplicative dei livelli di accesso che la struttura sta assegnando.
+
+\section{Invito di registrazione}
+
+Discutiamo ora il flusso di registrazione utenti che avviene tramite un invito da parte di un utente (con ruoli \texttt{HR}, \texttt{HD\_OPERATOR} o \texttt{RESPONSIBLE}).
+
+Supponiamo dunque che un utente con ruolo \texttt{HD\_OPERATOR} voglia invitare un utente a registrarsi nel sistema fornendogli l’accesso per i contesti applicativi definiti nella collezione \texttt{applications}. \\
+
+Gli utenti che hanno uno dei ruoli sopra riportati potranno dunque creare un invito dal seguente endpoint: \\
+\\
+\texttt{>> HR\textbar HD\_OPERATOR\textbar RESPONSIBLE POST /v1/invitations}
+\begin{lstlisting}
+{
+  "applications": [
+    {
+      "name": "PAIRING",
+      "permissions": [
+        "READ"
+      ]
+    }
+  ],
+  "userInfo": {
+    "firstName": "Invited",
+    "lastName": "User",
+    "company": "X-AUTH",
+    "contacts": [
+      {
+	   "type": "EMAIL",
+         "value": "invited.user@xauth.com"
+      }
+    ]
+  },
+  "description": "Simple user registration invitation",
+  "validFrom": "2018-12-31T00:00:00.000Z",
+  "validTo": "2019-12-31T00:00:00.000Z"
+}
+\end{lstlisting}
+\texttt{<< 201 CREATED} \\
+
+Come già detto in precedenza l’invito può essere creato solo da utenti con ruolo \texttt{HR}, \texttt{HD\_OPERATOR} o \texttt{RESPONSIBLE} e per la definizione dei contesti applicativi e dei relativi permessi valgono le seguenti regole: \\
+
+\begin{itemize}
+	\item \texttt{HR} - può invitare un utente a registrarsi ma non può specificare a quali applicazioni avrà accesso.
+	\item \texttt{HD\_OPERATOR} - può invitare un utente a registrarsi e può specificare l’accesso a tutte le applicazioni riconosciute dal sistema.
+	\item \texttt{RESPONSIBLE} - può invitare un utente a registrarsi e può specificare l’accesso solo alle applicazioni delle quali lui stesso ne è proprietario (\texttt{ha \textit{permission} OWNER}). Vuol dire che nel suo profilo personale esiste la collezione applications con almeno un’applicazione con la permission \texttt{OWNER}.
+\end{itemize} \\
+
+Nella sezione relativa ai ruoli di accessibilità viene fatto un riepilogo esaustivo di tutti i ruoli riconosciuti e gestiti dal sistema.
+
+\section{Ruoli di accessibilità}
+\label{roles}
+
+Segue un riepilogo del livello di accessibilità di ciascun ruolo:
+\subsection{\texttt{ADMIN}}
+È il primo utente ad essere creato in fase di inizializzazione della piattaforma che rappresenta in quel momento l'unico utente a potersi autenticare. Avendo accesso agli endpoint di amministrazione dunque può creare altri utenti modificandone i ruoli, può inviare un utente a registrarsi e può infine modificare le applicazioni associate ad un utente. Rappresenta il ruolo più alto del sistema.
+
+\subsection{\texttt{HD\_OPERATOR}}
+È l'abbreviazione di \textit{Help Desk Operator}, può invitare utenti alla registrazione e può assegnare applicazioni ad un utente.
+
+\subsection{\texttt{RESPONSIBLE}}
+L'utente che ha questo ruolo può invitare altri utenti a registrarsi ma ha delle restrizioni circa le applicazioni che può assegnare a questi ultimi. In sintesi può solo modificare le applicazioni di un utente se di queste egli ne è proprietario, ha cioè nel suo profilo l'applicazione in questione con il permesso di \texttt{OWNER}.
+
+\subsection{\texttt{USER}}
+È il ruolo più basso di tutti e indica al sistema che l'utente può autenticarsi, può dunque richiedere un token di accesso.
+
+\section{Registrazione da invito}
+Nel momento in cui l’utente è stato informato dell’invito il sistema gli ha anche inviato un codice di registrazione valido per finalizzare la sua registrazione.\\
+
+La registrazione finale avviene facendone richiesta al seguente endpoint:\\
+\\
+\texttt{>> ANON POST /v1/users}
+\begin{lstlisting}
+{
+  "invitationCode": "435nbq9tyb",
+  "password": "MyWonderfulPassword123",
+  "passwordCheck": "MyWonderfulPassword123",
+  "userInfo": {
+    "contacts": [
+      {
+        "type": "EMAIL",
+        "value": "invited.user@xauth.com"
+      }
+    ]
+  },
+  "privacy": true
+}
+\end{lstlisting}
+\texttt{<< 201 CREATED}\\
+
+L’utente è ora registrato.\\
+
+\textbf{RFC:} Si potrebbe pensare in questo caso di attivare automaticamente l’account senza il flusso da codice di attivazione.
+
+\section{Assegnazione applicazioni}
+L’utente con ruolo \texttt{HD\_OPERATOR} o \texttt{RESPONSIBLE} può assegnare le applicazioni e i relativi livelli di accessibilità per qualsiasi utente dunque anche per l’utente con ruolo \texttt{RESPONSIBLE}.
+
+In un primo momento avremo dunque la situazione in cui nessun utente ha applicazioni registrate e questo vuol dire che in questo momento solo l’utente con ruolo \texttt{HD\_OPERATOR} può assegnare o auto-assegnarsi delle applicazioni.\\
+
+Per fare questo si può effettuare una richiesta al seguente endpoint:\\
+\\
+\texttt{>> ADMIN\textbar HD\_OPERATOR\textbar RESPONSIBLE POST\\
+/v1/owner/users/42b436ca-...-8d5c-1e9df6e1c95c/applications}
+\begin{lstlisting}
+{
+  "applications": [
+    {
+      "name": "PAIRING",
+      "permissions": [
+        "OWNER", "READ", "WRITE"
+      ]
+    },
+    {
+      "name": "TRACKING_LABEL_CYBER",
+      "permissions": [
+        "READ"
+      ]
+    }
+  ]
+}
+\end{lstlisting}
+\texttt{<< 200 OK}\\
+
+Supponendo che tale richiesta di patch sia stata effettuata per l’utente con ruolo \texttt{RESPONSIBLE}, vuol dire che da questo momento l’utente può creare inviti di registrazione solo per l’applicazione \texttt{PAIRING} di cui egli stesso ne è proprietario, ha cioè per quell’applicazione la permission \texttt{OWNER}.
+
+\section{Il token di accesso}
+Arrivati a questo punto l’utente potrà effettuare l’autenticazione e ottenere il suo token di accesso.\\
+
+Il seguente oggetto JSON rappresenta un esempio del payload che un token di accesso codifica al suo interno:\\
+\
+\begin{lstlisting}
+{
+  "iss": "b1a92f50953a",
+  "sub": "2087c8b1-4b66-4a81-8f31-b064b121071f",
+  "exp": 1558111458,
+  "iat": 1558109658,
+  "roles": [
+    "RESPONSIBLE",
+    "USER"
+  ],
+  "applications": [
+    {
+      "name": "PAIRING",
+      "permissions": [
+        "OWNER",
+        "READ",
+        "WRITE"
+      ]
+    },
+    {
+      "name": "TRACKING_LABEL_CYBER",
+      "permissions": [
+        "READ"
+      ]
+    }
+  ]
+}
+\end{lstlisting} \\
+nel token troviamo dunque informazioni circa i ruoli dell’utente e le applicazioni con le relative modalità di accesso.
+
+\section{JWT e JWK}
+Il servizio può essere configurato per firmare il token erogato sia con un algoritmo di cifratura simmetrico che asimmetrico. Nel primo caso sarà sempre il servizio a poter verificare l’affidabilità del token poiché solo questo conosce la chiave utilizzata per firmare il token, nel secondo caso invece la verifica della firma può essere effettuata anche dall’esterno una volta nota la chiave pubblica.\\
+
+Nel caso in cui il servizio sia stato configurato per la firma con un algoritmo asimmetrico, il sistema rende disponibile il seguente endpoint per ottenere appunto la chiave pubblica:\\
+\\
+\texttt{>> ANON GET /v1/auth/jwk}\\
+\texttt{<< 200 OK}
+\begin{lstlisting}
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "e": "AQAB",
+      "use": "sig",
+      "kid": "rsa-256-kid",
+      "alg": "RS256",
+      "n": "0niy9P8bDyw4LMUr6VTS_2VOL8NrdxK-...zzz16BbhILc4g9MHbqjXw"
+    }
+  ]
+}
+\end{lstlisting}\\
+\\
+Leggendo la chiave pubblica dal campo \texttt{n} il client potrà dunque verificare in qualsiasi momento l'affidabilità del token e di conseguenza le informazioni in esso contenute.\\ \\
+\
+
+
+%\begin{table}[]
+%  \begin{tabular}{|c|l|l|}
+%    \hline \tt ANON & \tt POST & \tt /v1/init/configuration \\ \hline
+%  \end{tabular}
+%\end{table}
+
+\end{document}

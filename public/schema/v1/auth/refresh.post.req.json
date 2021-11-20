@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/auth/refresh",
+  "type": "object",
+  "properties": {
+    "refreshToken": {
+      "$ref": "{baseUrl}/public/schema/v1/auth/common.json#/definitions/RefreshToken",
+      "description": "Refresh token used to obtain another access token"
+    }
+  },
+  "required": [
+    "refreshToken"
+  ],
+  "additionalProperties": false
+}

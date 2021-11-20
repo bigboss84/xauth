@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Common authentication data types",
+  "definitions": {
+    "AccessToken": {
+      "description": "Defines the access token",
+      "type": "string",
+      "pattern": "^[\\w-+/=]+\\.[\\w-+/=]+\\.[\\w-+/=]+$"
+    },
+    "RefreshToken": {
+      "description": "Defines the refresh token",
+      "type": "string",
+      "pattern": "^[a-f0-9]+$",
+      "minLength": 40,
+      "maxLength": 40
+    },
+    "ActivationCode": {
+      "description": "Activation code that enables the user account",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9]+$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "PasswordResetCode": {
+      "description": "Code that allows to perform the password reset",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9]+$",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "AccountDeleteCode": {
+      "description": "Code that allows to delete definitively the user account",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9]+$",
+      "minLength": 32,
+      "maxLength": 32
+    }
+  }
+}

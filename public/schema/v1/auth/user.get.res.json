@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "GET /v1/auth/user",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "User identifier"
+    },
+    "username": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Username",
+      "description": "Username"
+    },
+    "description": {
+      "type": "string",
+      "description": "Simple and brief description account",
+      "maxLength": 128
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/AuthRole",
+        "description": "User roles"
+      },
+      "uniqueItems": true
+    },
+    "applications": {
+      "type": "array",
+      "items": {
+        "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Application"
+      },
+      "uniqueItems": true,
+      "description": "User applications"
+    },
+    "status": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/AuthStatus",
+      "description": "User account status"
+    },
+    "userInfo": {
+      "description": "User information",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ContactType"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^.+$",
+                "description": "Contact information"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief text that describes the contact"
+              },
+              "trusted": {
+                "type": "boolean",
+                "description": "Defines if the contact is trusted"
+              }
+            },
+            "required": [
+              "type", "value", "trusted"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "contacts"
+      ],
+      "additionalProperties": false
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User registration date"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User last update date"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "GET /v1/auth/user",
+  "type": "object",
+  "properties": {
+    "tokenStatus": {
+      "type": "string",
+      "enum": [
+        "VALID",
+        "INVALID"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

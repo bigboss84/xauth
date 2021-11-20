@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/invitations",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "Invitation identifier"
+    },
+    "code": {
+      "$ref": "{baseUrl}/public/schema/v1/invitations/common.json#/definitions/InvitationCode",
+      "description": "Invitation code for user registration"
+    },
+    "email": {
+      "type": "string",
+      "description": "User email",
+      "format": "email"
+    },
+    "description": {
+      "type": "string",
+      "description": "Simple and brief description that explains invitation",
+      "maxLength": 128
+    },
+    "userInfo": {
+      "description": "Preregistered user information",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ContactType"
+              },
+              "value": {
+                "type": "string",
+                "pattern": "^.+$",
+                "description": "Contact information"
+              },
+              "description": {
+                "type": "string",
+                "description": "Brief text that describes the contact"
+              },
+              "trusted": {
+                "type": "boolean",
+                "description": "Defines if the contact is trusted"
+              }
+            },
+            "required": [
+              "type", "value", "trusted"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "firstName",
+        "lastName",
+        "contacts"
+      ],
+      "additionalProperties": false
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If defined specifies the invitation validity start date"
+    },
+    "validTo": {
+      "type": "string",
+      "format": "date-time",
+      "description": "If defined specifies the invitation validity end date"
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation registration date"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Invitation last update date"
+    }
+  },
+  "additionalProperties": false
+}

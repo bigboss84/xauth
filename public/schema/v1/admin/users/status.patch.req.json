@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "PATCH /v1/admin/users/{id}/status",
+  "type": "object",
+  "properties": {
+    "status": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/AuthStatus",
+      "description": "Status that replaces the actual one"
+    }
+  },
+  "required": [
+    "status"
+  ],
+  "additionalProperties": false
+}

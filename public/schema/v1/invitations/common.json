@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Common invitation data types",
+  "definitions": {
+    "InvitationCode": {
+      "description": "Defines invitation code for user registration",
+      "type": "string",
+      "pattern": "^[a-z0-9]+$",
+      "minLength": 10,
+      "maxLength": 10
+    }
+  }
+}

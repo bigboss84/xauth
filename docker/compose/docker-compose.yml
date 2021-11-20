@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+
+  mongodb:
+    image: mongodb-auth:latest
+    container_name: "xauth.mongodb"
+    environment:
+      APP_DATABASE: xauth
+      APP_USERNAME: u_xauth
+      APP_PASSWORD: p_xauth
+    ports:
+    - 27017:27017
+    volumes:
+    - ./data/mongodb:/data/db

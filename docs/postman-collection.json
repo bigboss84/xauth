@@ -1,0 +1,2048 @@
+{
+	"info": {
+		"_postman_id": "f9d10504-3fa7-4f8b-b6df-4eb8d96855ea",
+		"name": "JWT Authenticator",
+		"description": "JWT Authentication Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "schema",
+			"item": [
+				{
+					"name": "admin",
+					"item": [
+						{
+							"name": "users",
+							"item": [
+								{
+									"name": "users.post.req.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/users/roles.patch.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"users",
+												"roles.patch.req.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "roles.put.req.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/users/roles.patch.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"users",
+												"roles.patch.req.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "roles.put.res.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/users/roles.patch.res.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"users",
+												"roles.patch.res.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "status.patch.req.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/users/status.patch.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"users",
+												"status.patch.req.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "status.patch.res.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/users/status.patch.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"users",
+												"status.patch.req.json"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "clients",
+							"item": [
+								{
+									"name": "client.post.req.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/clients/client.post.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"clients",
+												"client.post.req.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "client.post.res.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/clients/client.post.res.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"clients",
+												"client.post.res.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "client.put.req.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/clients/client.put.req.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"clients",
+												"client.put.req.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "client.put.res.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/clients/client.put.res.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"clients",
+												"client.put.res.json"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "common.json",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{baseUrl}}/public/schema/{{v}}/admin/clients/common.json",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"public",
+												"schema",
+												"{{v}}",
+												"admin",
+												"clients",
+												"common.json"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "common.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/common.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"common.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "activation.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/activation.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"activation.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "account-delete-confirmation.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/account-delete-confirmation.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"account-delete-confirmation.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "contact-trust.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/contact-trust.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"contact-trust.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "contact-trust.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/contact-trust.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"contact-trust.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "contact-activation.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/contact-activation.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"contact-activation.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "contact-activation.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/contact-activation.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"contact-activation.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "activation.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/activation.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"activation.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "token.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/token.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"token.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "token.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/token.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"token.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check.get.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/check.get.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"check.get.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refresh.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/refresh.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"refresh.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refresh.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/refresh.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"refresh.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "user.get.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/user.get.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"user.get.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "password-forgotten.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/password-forgotten.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"password-forgotten.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "password-reset.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/auth/password-reset.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"auth",
+										"password-reset.post.req.json"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "invitation",
+					"item": [
+						{
+							"name": "invitation.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/invitations/invitations.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"invitations",
+										"invitations.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invitation.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/invitations/invitations.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"invitations",
+										"invitations.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "invitation.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/invitations/invitations.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"invitations",
+										"invitations.post.res.json"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "users",
+					"item": [
+						{
+							"name": "users.post.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/users/users.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"users",
+										"users.post.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "users.post.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/users/users.post.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"users",
+										"users.post.res.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "user.get.req.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/users/user.get.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"users",
+										"user.get.req.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "user.get.res.json",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/users/user.get.res.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"users",
+										"user.get.res.json"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "init",
+					"item": [
+						{
+							"name": "user.get.res.json Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/public/schema/{{v}}/init/configuration.post.req.json",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"schema",
+										"{{v}}",
+										"init",
+										"configuration.post.req.json"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "common.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/public/schema/{{v}}/common.json",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"schema",
+								"{{v}}",
+								"common.json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "init",
+			"item": [
+				{
+					"name": "configuration",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"client\": {\n\t\"id\": \"trusted-client\",\n    \"secret\": \"trusted-client\"\n  },\n  \"admin\": {\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/init/configuration",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"init",
+								"configuration"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health",
+			"item": [
+				{
+					"name": "health",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "users",
+					"item": [
+						{
+							"name": "user",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"password\": \"{{password}}\",\n  \"passwordCheck\": \"{{password}}\",\n  \"description\": \"default user for human resource role\",\n  \"userInfo\": {\n  \t\"firstName\": \"hr\",\n  \t\"lastName\": \"hr\",\n  \t\"contacts\": [\n\t  {\n\t    \"type\": \"EMAIL\",\n\t\t\"value\": \"fake@fake.xauth.com\"\n\t  }\n  \t]\n  }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/users",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "roles",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"roles\": [\n  \t\"USER\",\n  \t\"HR\"\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/users/c808426d-1967-41a7-82f0-ef45383f426e/roles",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"users",
+										"c808426d-1967-41a7-82f0-ef45383f426e",
+										"roles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "unblock",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/users/{{userId}}/unblock",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"users",
+										"{{userId}}",
+										"unblock"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "status",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"status\": \"ENABLED\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/users/{{userId}}/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"users",
+										"{{userId}}",
+										"status"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "clients",
+					"item": [
+						{
+							"name": "client",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"trusted-client-2\",\n  \"secret\": \"MySecureSecret\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/clients?=",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"clients"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "clients",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/clients",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"clients"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "client",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/clients/trusted-client-2",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"clients",
+										"trusted-client-2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "client",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"trusted-client-2\",\n    \"secret\": \"SVYXG35fVd\",\n    \"registeredAt\": \"2018-11-16T18:54:43.043Z\",\n    \"updatedAt\": \"2018-11-16T18:57:54.054Z\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/clients/trusted-client-2",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"clients",
+										"trusted-client-2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "client",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseUrl}}/{{v}}/admin/clients/aaaaaaaaaaaaaaaaaaaaaaa",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"{{v}}",
+										"admin",
+										"clients",
+										"aaaaaaaaaaaaaaaaaaaaaaa"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "token",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "trusted-client",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "trusted-client",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{auth-client-secret}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{auth-client-id}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"87e847f5cab17d066f909bdd73260f7fda2e3338\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "activation",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "trusted-client",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "trusted-client",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"PpIgEeY4RxLlTOOe6A8taEJQz2wXxSDK\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/activation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"activation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "account-delete-request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/account-delete-request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"account-delete-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "account-delete-confirmation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"3NdDAmA6OYxunPi9xbR2opsKuFT9bCbd\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/account-delete-confirmation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"account-delete-confirmation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "contact-trust",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contact\": \"{{email}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/contact-trust",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"contact-trust"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "contact-activation",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"VqeoCBo2C2A4SjKFMeJQje9LxPHkAqDk\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/contact-activation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"contact-activation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "password-forgotten",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{username}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/password-forgotten",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"password-forgotten"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "password-reset",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"k761xUb5priAatRRszxVIZz3mTwdOtTh\",\n  \"password\": \"MyWonderfulS3cr37\",\n  \"passwordCheck\": \"MyWonderfulS3cr37\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/password-reset",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"password-reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/check",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/auth/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"auth",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "invitations",
+			"item": [
+				{
+					"name": "invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"fake@fake.xauth.com\",\n\t\"description\": \"Simple user registration invitation\",\n\t\"validFrom\": \"2018-12-31T00:00:00.000Z\",\n\t\"validTo\": \"2019-12-31T00:00:00.000Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/invitations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"invitations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/invitations/9a5356bd-8dc2-40eb-a887-7c18d4fc69d0/code",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"invitations",
+								"9a5356bd-8dc2-40eb-a887-7c18d4fc69d0",
+								"code"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/invitations?invitationCode=51n9z15h0q",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"invitations"
+							],
+							"query": [
+								{
+									"key": "invitationCode",
+									"value": "51n9z15h0q"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invitation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/invitations/398b7823-1456-418c-8a6b-50cabdec3a7a",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"invitations",
+								"398b7823-1456-418c-8a6b-50cabdec3a7a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invitation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/invitations/af7fe919-0700-4c1e-a289-e31b8bd0f32b",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"invitations",
+								"af7fe919-0700-4c1e-a289-e31b8bd0f32b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"invitationCode\": \"6i12a7oukn\",\n\t\"password\": \"MyS3cr37Pwd\",\n\t\"passwordCheck\": \"MyS3cr37Pwd\",\n\t\"userInfo\": {\n\t\t\"contacts\": [\n\t\t\t{\n\t\t\t\t\"type\": \"EMAIL\",\n\t\t\t\t\"value\": \"eduardo.oncione@fake.xauth.com\"\n\t\t\t}\n\t\t]\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/users/c808426d-1967-41a7-82f0-ef45383f426e",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"users",
+								"c808426d-1967-41a7-82f0-ef45383f426e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{v}}/users/8a3cb679-e5a4-4f06-afb8-12ecc3e856de",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{v}}",
+								"users",
+								"8a3cb679-e5a4-4f06-afb8-12ecc3e856de"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test",
+			"item": [
+				{
+					"name": "test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"test"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "X-Auth Account",
+  "from": "noreply-signin@xauth.com",
+  "subject": "Registration invitation",
+  "message": [
+    "Hello {firstName},",
+    "you have received a registration invitation code:",
+    "   {code}",
+    "",
+    "The code will be valid until:",
+    "   {codeExpiration}",
+    "",
+    "X-Auth",
+    "Central Authentication System"
+  ]
+}

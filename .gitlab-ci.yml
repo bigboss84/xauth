@@ -1,0 +1,16 @@
+image: docker:stable
+
+services:
+  - docker:dind
+stages:
+  - build
+
+build:
+  image: hseeberger/scala-sbt:latest
+  services:
+    - docker:dind
+  stage: build
+  script:
+    - sbt compile
+  only:
+    - master
