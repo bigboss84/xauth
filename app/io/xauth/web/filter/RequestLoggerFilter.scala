@@ -14,6 +14,8 @@ class RequestLoggerFilter @Inject()
   implicit val exec: ExecutionContext
 ) extends Filter {
 
+  private val logger: Logger = Logger(this.getClass)
+
   override def apply(nextFilter: RequestHeader => Future[Result])
                     (requestHeader: RequestHeader): Future[Result] = {
 
@@ -24,7 +26,7 @@ class RequestLoggerFilter @Inject()
       val endTime = System.currentTimeMillis
       val requestTime = endTime - startTime
 
-      Logger.info(s"request: method=${requestHeader.method}, uri=${requestHeader.uri}, time=$requestTime, status=${result.header.status}")
+      logger.info(s"request: method=${requestHeader.method}, uri=${requestHeader.uri}, time=$requestTime, status=${result.header.status}")
 
       result.withHeaders("Request-Time" -> requestTime.toString)
     }

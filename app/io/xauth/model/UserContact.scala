@@ -1,11 +1,11 @@
 package io.xauth.model
 
 import io.xauth.model.ContactType.ContactType
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 /**
-  * Defines minimum information of a contact
-  */
+ * Defines minimum information of a contact
+ */
 case class UserContact
 (
   `type`: ContactType,

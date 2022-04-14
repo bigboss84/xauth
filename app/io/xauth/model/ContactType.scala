@@ -5,11 +5,11 @@ import io.xauth.model.serial.EnumWrites.enumNameWrites
 import io.xauth.service.mongo.BsonHandlers.enumBsonHandler
 import it.russoft.xenum.Enum
 import play.api.libs.json.{Reads, Writes}
-import reactivemongo.bson.{BSONHandler, BSONString}
+import reactivemongo.api.bson.BSONHandler
 
 /**
-  * Defines all recognized and handled contact types.
-  */
+ * Defines all recognized and handled contact types.
+ */
 object ContactType extends Enum {
   type ContactType = EnumVal
 
@@ -21,5 +21,5 @@ object ContactType extends Enum {
   implicit val writes: Writes[ContactType] = enumNameWrites
 
   // Bson serialization
-  implicit val bsonHandler: BSONHandler[BSONString, ContactType] = enumBsonHandler(ContactType)
+  implicit val bsonHandler: BSONHandler[ContactType] = enumBsonHandler(ContactType)
 }

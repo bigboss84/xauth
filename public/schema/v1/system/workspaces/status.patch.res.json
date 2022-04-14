@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "PATCH /v1/system/workspaces/{id}/status",
+  "type": "object",
+  "properties": {
+    "status": {
+      "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/WorkspaceStatus",
+      "description": "Workspace status"
+    }
+  },
+  "required": [
+    "status"
+  ],
+  "additionalProperties": false
+}

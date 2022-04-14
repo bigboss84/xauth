@@ -1,28 +1,27 @@
 package io.xauth.web.controller.invitations
 
-import java.time.Duration
-import java.util.Date
-
 import io.xauth.model.ContactType.Email
 import io.xauth.model.Permission
 import io.xauth.service.applications.ApplicationService
-import io.xauth.service.auth.model.AuthRole.{Admin, HelpDeskOperator, HumanResource, Responsible}
+import io.xauth.service.auth.model.AuthRole.{HelpDeskOperator, HumanResource, Responsible}
 import io.xauth.service.auth.model.{AuthCode, AuthCodeType}
 import io.xauth.service.auth.{AuthCodeService, AuthUserService}
 import io.xauth.service.invitation.InvitationService
 import io.xauth.service.invitation.model.Invitation
 import io.xauth.service.invitation.model.Invitation.generateCode
-import io.xauth.web.action.auth.JwtAuthenticationAction
-import io.xauth.web.action.auth.JwtAuthenticationAction.{roleAction, userAction}
+import io.xauth.service.workspace.model.Workspace
+import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.invitations.model.InvitationResource
 import io.xauth.web.controller.invitations.model.InvitationResource._
 import io.xauth.{JsonSchemaLoader, Uuid}
-import javax.inject._
 import play.api.Logger
 import play.api.libs.json.Json.{obj, toJson}
 import play.api.libs.json._
 import play.api.mvc._
 
+import java.time.Duration
+import java.util.Date
+import javax.inject._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 import scala.util.{Failure, Success}
@@ -34,7 +33,7 @@ import scala.util.{Failure, Success}
 class InvitationController @Inject()
 (
   cc: ControllerComponents,
-  jwtAuthAction: JwtAuthenticationAction,
+  auth: AuthenticationManager,
   authService: AuthUserService,
   authCodeService: AuthCodeService,
   invitationService: InvitationService,
@@ -43,9 +42,10 @@ class InvitationController @Inject()
 )
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
+  private val logger: Logger = Logger(this.getClass)
+
   // human resource authenticated composed action
-  private val hrAction =
-    jwtAuthAction andThen userAction andThen roleAction(HumanResource, HelpDeskOperator, Responsible)
+  private val hrAction = auth.RoleAction(HumanResource, HelpDeskOperator, Responsible)
 
   /**
     * Creates new registration invitation
@@ -79,14 +79,16 @@ class InvitationController @Inject()
               else inv.userInfo.contacts.find(_.`type` == Email).map(_.value) match {
                 case Some(email) =>
 
+                  implicit val workspace: Workspace = request.workspace
+
                   // checking for existing user by email
                   authService.findByUsername(email).map {
-                    case Some(u) => successful(
+                    case Some(_) => successful(
                       BadRequest(obj("message" -> s"an existing user already corresponds to email '$email'"))
                     )
                     case _ =>
                       invitationService.findByEmail(email).map {
-                        case Some(i) => successful(BadRequest(obj("message" -> s"an existing invitation already corresponds to email '$email'")))
+                        case Some(_) => successful(BadRequest(obj("message" -> s"an existing invitation already corresponds to email '$email'")))
                         case _ =>
 
                           val newInv = Invitation(
@@ -100,7 +102,7 @@ class InvitationController @Inject()
                           // creating new invitation
                           invitationService.create(newInv) transformWith {
                             case Success(i) => successful(Created(Json.toJson(i.toResource)))
-                            case Failure(e) => successful(BadRequest(obj("message" -> s"No user found for email '$email'")))
+                            case Failure(_) => successful(BadRequest(obj("message" -> s"No user found for email '$email'")))
                           }
                       }.flatten
                   }.flatten
@@ -126,6 +128,8 @@ class InvitationController @Inject()
     * Retrieves the registration invitation by `q` parameter in query string.
     */
   def findAll: Action[AnyContent] = hrAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
+
     request.queryString("q") match {
       case s: Seq[String] if s.size == 1 && s.head.nonEmpty =>
         invitationService.findByEmail(s.head) flatMap {
@@ -145,7 +149,8 @@ class InvitationController @Inject()
   /**
     * Retrieves the registration invitation.
     */
-  def find(id: Uuid): Action[AnyContent] = hrAction.async {
+  def find(id: Uuid): Action[AnyContent] = hrAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
     invitationService.find(id).map {
       case Some(i) => Ok(toJson(i.toResource))
       case _ => NotFound
@@ -155,7 +160,8 @@ class InvitationController @Inject()
   /**
     * Deletes the registration invitation.
     */
-  def delete(id: Uuid): Action[AnyContent] = hrAction.async {
+  def delete(id: Uuid): Action[AnyContent] = hrAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
     invitationService.delete(id).map {
       if (_) NoContent else NotFound
     }
@@ -164,57 +170,57 @@ class InvitationController @Inject()
   /**
     * Generates invitation code.
     */
-  def createCode(id: Uuid): Action[JsValue] = hrAction.async(parse.json) {
-    request =>
+  def createCode(id: Uuid): Action[JsValue] = hrAction.async(parse.json) { request =>
 
-      import play.api.libs.json.Writes._
+    import play.api.libs.json.Writes._
 
-      def code = (c: String, d: Date) => obj(
-        "invitationCode" -> c, "expiresAt" -> dateWrites(iso8601DateFormat).writes(d)
-      )
+    def code = (c: String, d: Date) => obj(
+      "invitationCode" -> c, "expiresAt" -> dateWrites(iso8601DateFormat).writes(d)
+    )
 
-      // validating by json schema
-      jsonSchema.InvitationsCodePost.validate(request.body) match {
-        // json schema validation has been succeeded
-        case s: JsSuccess[JsValue] =>
+    // validating by json schema
+    jsonSchema.InvitationsCodePost.validate(request.body) match {
+      // json schema validation has been succeeded
+      case _: JsSuccess[JsValue] =>
+        implicit val workspace: Workspace = request.workspace
 
-          // checking for code existence
-          authCodeService.find(id, AuthCodeType.Invitation).map {
+        // checking for code existence
+        authCodeService.find(id, AuthCodeType.Invitation).map {
 
-            // invitation code has been already generated
-            case Some(i) => successful {
-              BadRequest(obj("message" -> "An invitation code already exists for this item"))
-            }
+          // invitation code has been already generated
+          case Some(_) => successful {
+            BadRequest(obj("message" -> "An invitation code already exists for this item"))
+          }
 
-            // invitation code not found
-            case _ =>
-              invitationService.find(id).map {
-                case Some(i) =>
-                  val contact = i.userInfo.contacts.headOption
+          // invitation code not found
+          case _ =>
+            invitationService.find(id).map {
+              case Some(i) =>
+                val contact = i.userInfo.contacts.headOption
 
-                  // invitation code validity
-                  val validity = i.validTo match {
-                    case Some(d) => Right(d)
-                    case _ => Left(Duration.ofDays(7))
-                  }
+                // invitation code validity
+                val validity = i.validTo match {
+                  case Some(d) => Right(d)
+                  case _ => Left(Duration.ofDays(7))
+                }
 
-                  // generating new invitation code
-                  authCodeService.save(AuthCodeType.Invitation, generateCode, id, contact, validity).map {
-                    case c: AuthCode =>
-                      Logger.info(s"registration code has been created")
-                      successful(Created(code(c.code, c.expiresAt)))
-                    case _ => successful(InternalServerError)
-                  }.flatten
+                // generating new invitation code
+                authCodeService.save(AuthCodeType.Invitation, generateCode, id, contact, validity).map {
+                  case c: AuthCode =>
+                    logger.info(s"registration code has been created")
+                    successful(Created(code(c.code, c.expiresAt)))
+                  case _ => successful(InternalServerError)
+                }.flatten
 
-                case _ => successful(NotFound)
-              }.flatten
-          }.flatten
+              case _ => successful(NotFound)
+            }.flatten
+        }.flatten
 
-        // json schema validation has been failed
-        case JsError(e) => successful {
-          BadRequest(JsError.toJson(e))
-        }
+      // json schema validation has been failed
+      case JsError(e) => successful {
+        BadRequest(JsError.toJson(e))
       }
+    }
   }
 
 }

@@ -37,9 +37,8 @@ RUN addgroup -S xauth; \
 WORKDIR /home/xauth
 
 # Copyng application files
-RUN mkdir .jwt
-ADD rsa-256-kid.private.der .jwt/
-ADD rsa-256-kid.public.der .jwt/
+RUN mkdir -p .jwt/keys/
+ADD ../../script/keygen.sh /home/.jwt/keys/
 ADD $APP_ARCHIVE .
 RUN unzip $APP_ARCHIVE
 RUN rm $APP_ARCHIVE

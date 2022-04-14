@@ -4,7 +4,7 @@ services:
 
   mongodb:
     image: mongodb-auth:latest
-    container_name: "xauth.mongodb"
+    container_name: "xauth.system"
     environment:
       APP_DATABASE: xauth
       APP_USERNAME: u_xauth
@@ -13,3 +13,15 @@ services:
     - 27017:27017
     volumes:
     - ./data/mongodb:/data/db
+
+  mongodb1:
+    image: mongodb-auth:latest
+    container_name: "xauth.workspace-1"
+    environment:
+      APP_DATABASE: workspace-1
+      APP_USERNAME: u_workspace-1
+      APP_PASSWORD: p_workspace-1
+    ports:
+      - 28017:27017
+    volumes:
+      - ./data/mongodb1:/data/db

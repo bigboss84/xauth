@@ -8,15 +8,16 @@ import io.xauth.service.MessagingClient
 import io.xauth.service.auth.AuthCodeService
 import io.xauth.service.auth.model.AuthCodeType.ContactTrust
 import io.xauth.service.auth.model.AuthUser
-import javax.inject.Inject
+import io.xauth.service.workspace.model.Workspace
 import play.api.Logger
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 /**
-  * Actor that dispatches email with contact trust code.
-  */
+ * Actor that dispatches email with contact trust code.
+ */
 class ContactTrustActor @Inject()
 (
   authCodeService: AuthCodeService,
@@ -25,19 +26,24 @@ class ContactTrustActor @Inject()
 )
 (implicit ec: ExecutionContext) extends Actor {
 
+  private val logger: Logger = Logger(this.getClass)
+
   private lazy val conf: EmailConfiguration = confLoader.ContactActivationConf
 
+  import ContactTrustActor._
+
   def receive: Actor.Receive = {
-    case (u: AuthUser, c: UserContact) =>
+    case m@ContactTrustMessage(u, c) =>
 
       if (c.`type` == Email) {
         u.userInfo.contacts.find(uc => uc.`type` == c.`type` && !uc.trusted && uc.value == c.value) match {
           case Some(contact) =>
+            implicit val workspace: Workspace = m.workspace
 
             // generating new trust code
             authCodeService.save(ContactTrust, u.id, Some(c)) onComplete {
               case Success(authCode) =>
-                Logger.info(s"sending trust code to ${contact.value}")
+                logger.info(s"sending trust code to ${contact.value}")
 
                 messagingClient.sendMail(
                   conf.name, conf.from, contact.value, conf.subject,
@@ -50,21 +56,26 @@ class ContactTrustActor @Inject()
                 )
 
               // code generation error
-              case Failure(e) =>
-                Logger.error(s"unable to generate contact trust code")
+              case Failure(_) =>
+                logger.error(s"unable to generate contact trust code")
             }
 
           // no email contact
-          case _ => Logger.warn(s"no untrusted email contact for user ${u.id}")
+          case _ => logger.warn(s"no untrusted email contact for user ${u.id}")
         }
       }
 
       // not handled contact type
-      else Logger.warn(s"${c.value} is not of type email")
+      else logger.warn(s"${c.value} is not of type email")
 
     // not handled message type
-    case _ => Logger.warn("unable to dispatch email: message not handled")
+    case _ => logger.warn("unable to dispatch email: message not handled")
   }
+}
+
+object ContactTrustActor {
+  case class ContactTrustMessage(user: AuthUser, contact: UserContact)
+                                (implicit val workspace: Workspace) extends WorkspaceMessage
 }
 
 

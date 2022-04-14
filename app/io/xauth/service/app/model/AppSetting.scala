@@ -1,12 +1,12 @@
 package io.xauth.service.app.model
 
 import io.xauth.service.app.model.AppKey.AppKey
-import reactivemongo.bson.Macros.Annotations.Key
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.Macros.Annotations.Key
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 /**
-  * Defines application configuration.
-  */
+ * Defines application configuration.
+ */
 case class AppSetting(@Key("_id") key: AppKey, value: String)
 
 object AppSetting {

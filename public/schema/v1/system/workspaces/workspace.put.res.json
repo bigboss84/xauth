@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "PUT /v1/system/workspaces/{id}",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "Workspace identifier"
+    },
+    "tenantId": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "Tenant identifier"
+    },
+    "slug": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/NameSlug",
+      "description": "Name in slug format"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description"
+    },
+    "status": {
+      "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/WorkspaceStatus",
+      "description": "Workspace status"
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "dbUri": {
+          "type": "string",
+          "description": "URI of the persistence system"
+        },
+        "jwt": {
+          "type": "object",
+          "properties": {
+            "expiration": {
+              "type": "object",
+              "properties": {
+                "accessToken": {
+                  "type": "integer",
+                  "description": "Access token expiration (in seconds)",
+                  "default": 1800
+                },
+                "refreshToken": {
+                  "type": "integer",
+                  "description": "Refresh token expiration (in hours)",
+                  "default": 12
+                }
+              },
+              "required": [
+                "accessToken",
+                "refreshToken"
+              ],
+              "additionalProperties": false
+            },
+            "encryption": {
+              "type": "object",
+              "description": "Token encryption settings",
+              "properties": {
+                "algorithm": {
+                  "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/TokenAlgorithm",
+                  "description": "Asymmetric/Symmetric algorithm type"
+                }
+              },
+              "required": [
+                "algorithm"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "expiration",
+            "encryption"
+          ],
+          "additionalProperties": false
+        },
+        "zoneId": {
+          "$ref": "{baseUrl}/public/schema/v1/timezone.json#/definitions/ZoneId",
+          "description": "Zone identifier"
+        }
+      },
+      "required": [
+        "dbUri",
+        "jwt",
+        "zoneId"
+      ],
+      "additionalProperties": false
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Workspace registration date"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Workspace last update date"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "slug",
+    "description",
+    "status",
+    "configuration",
+    "registeredAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

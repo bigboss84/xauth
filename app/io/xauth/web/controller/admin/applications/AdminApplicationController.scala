@@ -3,14 +3,13 @@ package io.xauth.web.controller.admin.applications
 import io.xauth.JsonSchemaLoader
 import io.xauth.service.applications.ApplicationService
 import io.xauth.service.auth.model.AuthRole.Admin
-import io.xauth.web.action.auth.JwtAuthenticationAction
-import io.xauth.web.action.auth.JwtAuthenticationAction.{roleAction, userAction}
+import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.admin.applications.model.SystemApplications
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json.{obj, toJson}
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 
@@ -20,7 +19,7 @@ import scala.concurrent.Future.successful
 @Singleton
 class AdminApplicationController @Inject()
 (
-  jwtAuthAction: JwtAuthenticationAction,
+  auth: AuthenticationManager,
   jsonSchema: JsonSchemaLoader,
   applicationService: ApplicationService,
   cc: ControllerComponents
@@ -28,8 +27,7 @@ class AdminApplicationController @Inject()
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   // admin authenticated composed action
-  private val adminAction =
-    jwtAuthAction andThen userAction andThen roleAction(Admin)
+  private val adminAction = auth.RoleAction(Admin)
 
   def findAll: Action[AnyContent] = adminAction.async {
     // finding system applications

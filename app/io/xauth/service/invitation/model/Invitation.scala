@@ -1,25 +1,23 @@
 package io.xauth.service.invitation.model
 
+import io.xauth.Uuid
+import io.xauth.model.{AppInfo, DataFormat, UserInfo}
+import reactivemongo.api.bson.Macros.Annotations.Key
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+
 import java.util.Date
 
-import io.xauth.UuidType.UuidType
-import io.xauth.model.{AppInfo, DataFormat, UserInfo}
-import io.xauth.service.mongo.BsonHandlers.uuidBsonHandler
-import io.xauth.{Uuid, UuidType}
-import reactivemongo.bson.Macros.Annotations.Key
-import reactivemongo.bson.{BSONBinary, BSONDocumentHandler, BSONHandler, Macros}
-
 /**
-  * Registration invitation model.
-  *
-  * @param id           Identifier
-  * @param description  Simple and brief description that explains invitation
-  * @param userInfo     Pre-filled user information
-  * @param validFrom    If defined specifies the invitation validity start date
-  * @param validTo      If defined specifies the invitation validity end date
-  * @param registeredAt Invitation registration date
-  * @param updatedAt    Invitation last update date
-  */
+ * Registration invitation model.
+ *
+ * @param id           Identifier
+ * @param description  Simple and brief description that explains invitation
+ * @param userInfo     Pre-filled user information
+ * @param validFrom    If defined specifies the invitation validity start date
+ * @param validTo      If defined specifies the invitation validity end date
+ * @param registeredAt Invitation registration date
+ * @param updatedAt    Invitation last update date
+ */
 case class Invitation
 (
   @Key("_id")
@@ -67,12 +65,6 @@ object Invitation extends DataFormat {
       and (__ \ "updatedAt").writeNullable(dateWrites(iso8601DateFormat))
     ) (unlift(Invitation.unapply))
 
-  //
-  // Bson handlers
-  //
-
+  import io.xauth.service.mongo.BsonHandlers._
   implicit val bsonDocumentHandler: BSONDocumentHandler[Invitation] = Macros.handler[Invitation]
-
-  implicit val idType: UuidType = UuidType.Invitation
-  implicit val bsonHandler: BSONHandler[BSONBinary, Uuid] = uuidBsonHandler
 }

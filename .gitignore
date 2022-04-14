@@ -12,6 +12,5 @@ project/project
 docker/compose/data
 docker/build/*.zip
 docker/build/*.der
-conf/rds-combined-ca-bundle.p12
 .DS_Store
 .bsp

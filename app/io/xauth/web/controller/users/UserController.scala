@@ -1,21 +1,22 @@
 package io.xauth.web.controller.users
 
 import io.xauth.model.ContactType.Email
-import io.xauth.service.auth.model.{AuthCodeType, AuthRole, AuthStatus}
+import io.xauth.service.auth.model.AuthCodeType
 import io.xauth.service.auth.model.AuthRole.{Admin, HelpDeskOperator, Responsible, User}
 import io.xauth.service.auth.model.AuthStatus.Disabled
 import io.xauth.service.auth.{AuthCodeService, AuthUserService}
 import io.xauth.service.invitation.InvitationService
-import io.xauth.web.action.auth.JwtAuthenticationAction
-import io.xauth.web.action.auth.JwtAuthenticationAction.{roleAction, userAction}
+import io.xauth.service.workspace.model.Workspace
+import io.xauth.web.action.auth.AuthenticationManager
+import io.xauth.web.action.auth.model.{UserRequest, WorkspaceRequest}
 import io.xauth.web.controller.users.model.UserReq
 import io.xauth.web.controller.users.model.UserRes._
 import io.xauth.{JsonSchemaLoader, Uuid}
-import javax.inject.{Singleton, _}
 import play.api.libs.json.Json.obj
-import play.api.libs.json.{JsValue, _}
-import play.api.mvc.{Action, _}
+import play.api.libs.json._
+import play.api.mvc._
 
+import javax.inject._
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject
 (
   cc: ControllerComponents,
-  jwtAuthAction: JwtAuthenticationAction,
+  auth: AuthenticationManager,
   authService: AuthUserService,
   authCodeService: AuthCodeService,
   jsonSchema: JsonSchemaLoader,
@@ -35,19 +36,20 @@ class UserController @Inject
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   // admin authenticated composed action
-  private val adminAction =
-    jwtAuthAction andThen userAction andThen roleAction(Admin)
+  private val adminAction = auth.RoleAction(Admin)
 
-  private val helpDeskAction =
-    jwtAuthAction andThen userAction andThen roleAction(Admin, HelpDeskOperator, Responsible)
+  private val helpDeskAction = auth.RoleAction(Admin, HelpDeskOperator, Responsible)
 
   /**
     * Creates new user
     */
-  def create: Action[JsValue] = Action.async(parse.json) { request =>
+  def create: Action[JsValue] = auth.WorkspaceAction.async(parse.json) { request =>
     // json schema validation
     jsonSchema.UsersPost.validateObj[UserReq](request.body) match {
       case s: JsSuccess[UserReq] =>
+        implicit val workspace: Workspace =
+          request.asInstanceOf[WorkspaceRequest[_]].workspace
+
         val usr = s.value
 
         // logic validation
@@ -73,7 +75,7 @@ class UserController @Inject
 
           // check username existence
           authService.findByUsername(username) flatMap {
-            case Some(u) => successful(BadRequest(obj("message" -> "username already registered")))
+            case Some(_) => successful(BadRequest(obj("message" -> "username already registered")))
             case _ => usr.invitationCode match {
               // registration by invitation id
               case Some(invitationCode) =>
@@ -116,7 +118,10 @@ class UserController @Inject
   /**
     * Retrieves the user.
     */
-  def find(id: Uuid): Action[AnyContent] = helpDeskAction.async {
+  def find(id: Uuid): Action[AnyContent] = helpDeskAction.async { request =>
+    implicit val workspace: Workspace =
+      request.asInstanceOf[UserRequest[_]].workspace
+
     authService.findById(id).map {
       case Some(u) => Ok(Json.toJson(u.toResource))
       case None => NotFound
@@ -126,9 +131,11 @@ class UserController @Inject
   /**
     * Deletes the user.
     */
-  def delete(id: Uuid): Action[AnyContent] = adminAction.async {
-    authService.delete(id).map {
-      if (_) NoContent else NotFound
+  def delete(id: Uuid): Action[AnyContent] = adminAction.async { r =>
+    val request = r.asInstanceOf[UserRequest[_]]
+    implicit val workspace: Workspace = request.workspace
+    authService.delete(id).map { b =>
+      if (b) NoContent else NotFound
     }
   }
 

@@ -1,9 +1,9 @@
 package io.xauth.service.auth.model
 
-import java.util.Date
-
 import io.xauth.model.DataFormat
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+
+import java.util.Date
 
 case class AuthAccessAttempt
 (
@@ -34,5 +34,6 @@ object AuthAccessAttempt extends DataFormat {
       and (__ \ "registeredAt").write(dateWrites(iso8601DateFormat))
     ) (unlift(AuthAccessAttempt.unapply))
 
+  import io.xauth.service.mongo.BsonHandlers._
   implicit val bsonDocumentHandler: BSONDocumentHandler[AuthAccessAttempt] = Macros.handler[AuthAccessAttempt]
 }

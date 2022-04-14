@@ -1,57 +1,66 @@
 package io.xauth.web.action.auth
 
-import java.util.Base64
-
 import io.xauth.service.auth.AuthClientService
-import io.xauth.util.Implicits._
-import io.xauth.web.action.auth.BasicAuthenticationAction._
-import io.xauth.web.action.auth.model.{BasicRequest, ClientCredentials}
-import javax.inject.Inject
+import io.xauth.service.workspace.model.Workspace
+import io.xauth.web.action.auth.model.{BasicRequest, ClientCredentials, WorkspaceRequest}
 import play.api.Logger
 import play.api.libs.json.Json
+import play.api.libs.typedmap.TypedKey
 import play.api.mvc.Results.{Forbidden, Unauthorized}
-import play.api.mvc._
+import play.api.mvc.{ActionRefiner, BodyParsers, Request, Result}
 
+import java.util.Base64
+import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Implements logic to perform a basic authentication.
   */
-class BasicAuthenticationAction @Inject()
+class BasicAuthenticationRefiner @Inject()
 (
   authClientService: AuthClientService,
   parser: BodyParsers.Default
-)(implicit ec: ExecutionContext) extends ActionBuilderImpl(parser) {
+)(implicit ec: ExecutionContext) extends ActionRefiner[WorkspaceRequest, BasicRequest] {
 
-  private def unauthorized(m: String) = successful(Unauthorized(Json.obj("message" -> m)))
+  private val logger: Logger = Logger(this.getClass)
 
-  private def forbidden(m: String) = successful(Forbidden(Json.obj("message" -> m)))
+  private def unauthorized(m: String) = Left(Unauthorized(Json.obj("message" -> m)))
 
-  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
+  private def forbidden(m: String) = Left(Forbidden(Json.obj("message" -> m)))
+
+  override protected def executionContext: ExecutionContext = ec
+
+  override protected def refine[A](request: WorkspaceRequest[A]): Future[Either[Result, BasicRequest[A]]] = {
+    import BasicAuthenticationRefiner._
+    import io.xauth.util.Implicits._
+
+    implicit val workspace: Workspace = request.workspace
 
     request.clientCredentials match {
       case Some(c) =>
         // getting basic authentication info
-        authClientService.find(c.id).flatMap {
+        authClientService.find(c.id) map {
           case Some(cc) =>
             // verifying client credentials
             if (c.id == cc.id && c.secret.md5 == cc.secret) {
-              block(BasicRequest(c, request)) // client credentials are valid
+              Right(BasicRequest(c, workspace, request)) // client credentials are valid
             } else {
-              Logger.warn(s"invalid client credentials for ${c.id}:${c.secret}")
+              logger.warn(s"invalid client credentials for ${c.id}:${c.secret}")
               unauthorized("invalid client credentials")
             }
           case None =>
-            Logger.warn(s"bad client credentials for ${c.id}:${c.secret}")
+            logger.warn(s"bad client credentials for ${c.id}:${c.secret}")
             forbidden("bad client credentials")
         }
-      case _ => forbidden("client credentials are required")
+      case _ => successful(forbidden("client credentials are required"))
     }
   }
 }
 
-object BasicAuthenticationAction {
+object BasicAuthenticationRefiner {
+
+  val ClientCredentialsKey: TypedKey[ClientCredentials] = TypedKey[ClientCredentials]
 
   private val AuthHeader = "Authorization"
   private val AuthBasicRegex = "^Basic\\s+(?<auth>.*)".r

@@ -7,15 +7,16 @@ import io.xauth.service.MessagingClient
 import io.xauth.service.auth.AuthCodeService
 import io.xauth.service.auth.model.AuthCodeType.Activation
 import io.xauth.service.auth.model.AuthUser
-import javax.inject.Inject
+import io.xauth.service.workspace.model.Workspace
 import play.api.Logger
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 /**
-  * Activation Email dispatcher actor.
-  */
+ * Activation Email dispatcher actor.
+ */
 class AccountActivationActor @Inject()
 (
   authCodeService: AuthCodeService,
@@ -24,20 +25,25 @@ class AccountActivationActor @Inject()
 )
 (implicit ec: ExecutionContext) extends Actor {
 
+  private val logger: Logger = Logger(this.getClass)
+
   private lazy val conf: EmailConfiguration = confLoader.AccountActivationConf
+
+  import AccountActivationActor._
 
   def receive: Actor.Receive = {
 
     // activation email
-    case u: AuthUser =>
+    case m@ActivateUserMessage(u) =>
 
       u.userInfo.contacts.find(_.`type` == Email) match {
         case Some(contact) =>
+          implicit val workspace: Workspace = m.workspace
 
           // generating new activation code
           authCodeService.save(Activation, u.id, Some(contact)) onComplete {
             case Success(authCode) =>
-              Logger.info(s"sending activation email to ${contact.value}")
+              logger.info(s"sending activation email to ${contact.value}")
 
               messagingClient.sendMail(
                 conf.name, conf.from, contact.value, conf.subject,
@@ -50,19 +56,22 @@ class AccountActivationActor @Inject()
               )
 
             // code generation error
-            case Failure(e) =>
-              Logger.error(s"unable to generate activation code")
+            case Failure(_) =>
+              logger.error(s"unable to generate activation code")
           }
 
         // no email contact
-        case _ => Logger.warn(s"no email contact for user ${u.id}")
+        case _ => logger.warn(s"no email contact for user ${u.id}")
       }
 
     // not handled message type
-    case _ => Logger.warn("unable to dispatch email: message not handled")
+    case _ => logger.warn("unable to dispatch email: message not handled")
   }
 }
 
 object AccountActivationActor {
   def props: Props = Props[AccountActivationActor]
+
+  case class ActivateUserMessage(user: AuthUser)
+                                (implicit val workspace: Workspace) extends WorkspaceMessage
 }

@@ -1,10 +1,10 @@
 package io.xauth.model
 
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 /**
-  * Defines user information.
-  */
+ * Defines user information.
+ */
 case class UserInfo
 (
   firstName: String,

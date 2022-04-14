@@ -2,10 +2,10 @@ package io.xauth.web.controller.admin.users
 
 import io.xauth.model.ContactType.Email
 import io.xauth.service.auth.AuthUserService
-import io.xauth.service.auth.model.AuthRole.Admin
+import io.xauth.service.auth.model.AuthRole.{Admin, System}
 import io.xauth.service.auth.model.AuthStatus.{Blocked, Disabled, Enabled}
-import io.xauth.web.action.auth.JwtAuthenticationAction
-import io.xauth.web.action.auth.JwtAuthenticationAction.{roleAction, userAction}
+import io.xauth.service.workspace.model.Workspace
+import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.admin.users.model.UserRes._
 import io.xauth.web.controller.admin.users.model.{AccountTrustReq, UserReq, UserRoles, UserStatus}
 import io.xauth.{JsonSchemaLoader, Uuid}
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AdminUserController @Inject()
 (
-  jwtAuthAction: JwtAuthenticationAction,
+  auth: AuthenticationManager,
   jsonSchema: JsonSchemaLoader,
   authUserService: AuthUserService,
   cc: ControllerComponents
@@ -31,13 +31,17 @@ class AdminUserController @Inject()
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   // admin authenticated composed action
-  private val adminAction =
-    jwtAuthAction andThen userAction andThen roleAction(Admin)
+  private val adminAction = auth.RoleAction(Admin)
 
+  /**
+    * Creates new user and sends it the activation code.
+    */
   def create: Action[JsValue] = adminAction.async(parse.json) { request =>
     // json schema validation
     jsonSchema.AdminUsersPost.validateObj[UserReq](request.body) match {
       case s: JsSuccess[UserReq] =>
+        implicit val workspace: Workspace = request.workspace
+
         val usr = s.value
 
         // logic validation
@@ -59,7 +63,7 @@ class AdminUserController @Inject()
 
           // check username existence
           authUserService.findByUsername(username) flatMap {
-            case Some(u) => successful(BadRequest(obj("message" -> "username already registered")))
+            case Some(_) => successful(BadRequest(obj("message" -> "username already registered")))
             case _ => authUserService.save(username, usr.password, usr.description, usr.userInfo) flatMap {
               u => successful(Created(toJson(u.toResource)))
             }
@@ -71,14 +75,32 @@ class AdminUserController @Inject()
     }
   }
 
-  def find(id: Uuid): Action[AnyContent] = adminAction.async { r =>
+  /**
+    * Finds the user by id.
+    */
+  def find(id: Uuid): Action[AnyContent] = adminAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
     authUserService.findById(id).map {
       case Some(u) => Ok(Json.toJson(u.toResource))
       case _ => NotFound
     }
   }
 
-  def unblock(id: Uuid): Action[AnyContent] = adminAction.async {
+  /**
+    * Deletes the user by id.
+    */
+  def delete(id: Uuid): Action[AnyContent] = adminAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
+    authUserService.findById(id).map {
+      case Some(_) =>
+        authUserService.delete(id)
+        NoContent
+      case _ => NotFound
+    }
+  }
+
+  def unblock(id: Uuid): Action[AnyContent] = adminAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
     authUserService.findById(id) map {
       case Some(u) =>
         if (u.status == Blocked) {
@@ -90,25 +112,25 @@ class AdminUserController @Inject()
     }
   }
 
-  def patchRoles(id: Uuid): Action[JsValue] = adminAction.async(parse.json) {
-    request =>
+  def patchRoles(id: Uuid): Action[JsValue] = adminAction.async(parse.json) { request =>
+    // validating by json schema
+    jsonSchema.AdminUserRolesPatch.validateObj[UserRoles](request.body) match {
+      // json schema validation has been succeeded
+      case s: JsSuccess[UserRoles] =>
+        implicit val workspace: Workspace = request.workspace
 
-      // validating by json schema
-      jsonSchema.AdminUserRolesPatch.validateObj[UserRoles](request.body) match {
-        // json schema validation has been succeeded
-        case s: JsSuccess[UserRoles] =>
+        if (s.value.roles.contains(System) && !request.authUser.roles.contains(System)) {
+          successful(BadRequest(Json.toJson("message" -> "permissions too low to assign a system role")))
+        }
+        // saving new roles collection
+        else authUserService.updateRoles(id, s.value.roles: _*) map {
+          case Some(u) => Ok(toJson(UserRoles(u.roles)))
+          case _ => NotFound
+        }
 
-          val body = s.value
-
-          // saving new roles collection
-          authUserService.updateRoles(id, s.value.roles: _*) map {
-            case Some(u) => Ok(toJson(UserRoles(u.roles)))
-            case _ => NotFound
-          }
-
-        // json schema validation has been failed
-        case JsError(e) => successful(BadRequest(JsError.toJson(e)))
-      }
+      // json schema validation has been failed
+      case JsError(e) => successful(BadRequest(JsError.toJson(e)))
+    }
   }
 
   def patchStatus(id: Uuid): Action[JsValue] = adminAction.async(parse.json) {
@@ -118,6 +140,7 @@ class AdminUserController @Inject()
       jsonSchema.AdminUserStatusPatch.validateObj[UserStatus](request.body) match {
         // json schema validation has been succeeded
         case s: JsSuccess[UserStatus] =>
+          implicit val workspace: Workspace = request.workspace
 
           val body = s.value
 
@@ -132,28 +155,27 @@ class AdminUserController @Inject()
       }
   }
 
-  def accountTrust: Action[JsValue] = adminAction.async(parse.json) {
-    request =>
-      // validating by json schema
-      jsonSchema.AdminAccountTrustPostReq.validateObj[AccountTrustReq](request.body) match {
-        // json schema validation has been succeeded
-        case s: JsSuccess[AccountTrustReq] =>
+  def accountTrust: Action[JsValue] = adminAction.async(parse.json) { request =>
+    // validating by json schema
+    jsonSchema.AdminAccountTrustPostReq.validateObj[AccountTrustReq](request.body) match {
+      // json schema validation has been succeeded
+      case s: JsSuccess[AccountTrustReq] =>
+        implicit val workspace: Workspace = request.workspace
+        val body = s.value
 
-          val body = s.value
+        authUserService.findByUsername(body.username) flatMap {
+          case Some(u) if u.status == Disabled =>
+            authUserService.trustAccount(u)
+            successful(Accepted)
+          case Some(u) if u.status != Disabled =>
+            successful(BadRequest(obj("message" -> s"user status is '${u.status}'")))
+          case _ =>
+            successful(NotFound)
+        }
 
-          authUserService.findByUsername(body.username) flatMap {
-            case Some(u) if u.status == Disabled =>
-              authUserService.trustAccount(u)
-              successful(Accepted)
-            case Some(u) if u.status != Disabled =>
-              successful(BadRequest(obj("message" -> s"user status is '${u.status}'")))
-            case _ =>
-              successful(NotFound)
-          }
-
-        // json schema validation has been failed
-        case JsError(e) => successful(BadRequest(JsError.toJson(e)))
-      }
+      // json schema validation has been failed
+      case JsError(e) => successful(BadRequest(JsError.toJson(e)))
+    }
   }
 
 }

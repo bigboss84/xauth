@@ -2,7 +2,7 @@ name := "x-auth"
 organization := "io.xauth"
 organizationName := "X-Auth"
 
-version := "0.3.23"
+version := "2.0.0"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -25,9 +25,6 @@ libraryDependencies ++= Seq(
   // Http client
   ws,
 
-  // Play-JDBC
-  "com.typesafe.play" %% "play-jdbc" % "2.6.18",
-
   // Play
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
 
@@ -35,8 +32,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "6.0.1",
 
   // MongoDb
-  "org.mongodb.scala" %% "mongo-scala-driver" % "2.6.0",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.16.0-play26",
+  "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0",
+  "org.reactivemongo" %% "play2-reactivemongo" % "1.1.0-play28-RC3",
 
   // Json-Schema validator todo: unmanaged dependency
   //"com.eclipsesource" %% "play-json-schema-validator" % "0.9.5",
@@ -46,7 +43,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % "0.14.1",
 
   // Akka
-  "com.typesafe.akka" %% "akka-distributed-data" % "2.5.14",
+  "com.typesafe.akka" %% "akka-distributed-data" % "2.6.19",
 
   // JWT
   "com.pauldijou" %% "jwt-core" % "0.17.0",

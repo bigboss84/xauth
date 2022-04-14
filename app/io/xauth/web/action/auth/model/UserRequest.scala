@@ -1,6 +1,7 @@
 package io.xauth.web.action.auth.model
 
 import io.xauth.service.auth.model.AuthUser
+import io.xauth.service.workspace.model.Workspace
 import play.api.mvc.{Request, WrappedRequest}
 
 /**
@@ -8,5 +9,5 @@ import play.api.mvc.{Request, WrappedRequest}
   */
 case class UserRequest[A]
 (
-  authUser: AuthUser, request: Request[A]
+  authUser: AuthUser, workspace: Workspace, request: Request[A]
 ) extends WrappedRequest(request)

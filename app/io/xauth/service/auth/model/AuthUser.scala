@@ -1,15 +1,13 @@
 package io.xauth.service.auth.model
 
-import java.util.Date
-
-import io.xauth.UuidType.UuidType
+import io.xauth.Uuid
 import io.xauth.model.{AppInfo, DataFormat, UserInfo}
 import io.xauth.service.auth.model.AuthRole.AuthRole
 import io.xauth.service.auth.model.AuthStatus.AuthStatus
-import io.xauth.service.mongo.BsonHandlers.uuidBsonHandler
-import io.xauth.{Uuid, UuidType}
-import reactivemongo.bson.Macros.Annotations.Key
-import reactivemongo.bson.{BSONBinary, BSONDocumentHandler, BSONHandler, Macros}
+import reactivemongo.api.bson.Macros.Annotations.Key
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+
+import java.util.Date
 
 case class AuthUser
 (
@@ -32,11 +30,11 @@ object AuthUser extends DataFormat {
   import com.lambdaworks.crypto.SCryptUtil._
 
   /**
-    * Cyphers the string with a generated salt.
-    *
-    * @return Returns a [[Tuple2]] that contains generated salt and hashed string
-    *         using `scrypt` encryption algorithm.
-    */
+   * Cyphers the string with a generated salt.
+   *
+   * @return Returns a [[Tuple2]] that contains generated salt and hashed string
+   *         using `scrypt` encryption algorithm.
+   */
   def cryptWithSalt(s: String): (String, String) = {
     import io.xauth.util.Implicits.RandomString
     val salt = (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')).random(79)
@@ -45,14 +43,14 @@ object AuthUser extends DataFormat {
   }
 
   /**
-    * Checks if hashed string has been encrypted for given salt and string.
-    *
-    * @param s  The salt.
-    * @param ss The string to check with salt `s`.
-    * @param hs The hashed string.
-    * @return Returns `true` if `hs` has been encrypted by the given `s` salt and
-    *         the the string `s`, returns false otherwise.
-    */
+   * Checks if hashed string has been encrypted for given salt and string.
+   *
+   * @param s  The salt.
+   * @param ss The string to check with salt `s`.
+   * @param hs The hashed string.
+   * @return Returns `true` if `hs` has been encrypted by the given `s` salt and
+   *         the the string `s`, returns false otherwise.
+   */
   def checkWithSalt(s: String, ss: String, hs: String): Boolean = check(s + ss, hs)
 
   import play.api.libs.functional.syntax._
@@ -88,8 +86,6 @@ object AuthUser extends DataFormat {
       and (__ \ "updatedAt").write(dateWrites(iso8601DateFormat))
     ) (unlift(AuthUser.unapply))
 
+  import io.xauth.service.mongo.BsonHandlers._
   implicit val bsonDocumentHandler: BSONDocumentHandler[AuthUser] = Macros.handler[AuthUser]
-
-  implicit val idType: UuidType = UuidType.User
-  implicit val bsonHandler: BSONHandler[BSONBinary, Uuid] = uuidBsonHandler
 }

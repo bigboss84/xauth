@@ -5,7 +5,7 @@ import io.xauth.service.mongo.BsonHandlers.uuidBsonHandler
 import it.russoft.xenum.Enum
 import play.api.libs.json._
 import play.api.mvc.PathBindable
-import reactivemongo.bson.{BSONBinary, BSONHandler}
+import reactivemongo.api.bson.BSONHandler
 
 import java.nio.ByteBuffer
 import java.util.UUID
@@ -28,6 +28,8 @@ case class Uuid(uuid: Option[UUID] = None) {
 
 object Uuid {
 
+  val Zero: Uuid = Uuid("00000000-0000-0000-0000-000000000000")
+
   def apply(uuid: String): Uuid = new Uuid(Some(UUID.fromString(uuid)))
 
   def apply(bytes: Array[Byte]): Uuid = {
@@ -49,7 +51,7 @@ object Uuid {
   }
 
   // Bson serialization
-  implicit val bsonHandler: BSONHandler[BSONBinary, Uuid] = uuidBsonHandler
+  implicit val bsonHandler: BSONHandler[Uuid] = uuidBsonHandler
 
   // Path binder
   implicit object UuidPathBindable extends PathBindable[Uuid] {
@@ -66,17 +68,27 @@ object UuidType extends Enum {
   type UuidType = EnumVal
 
   /**
-    * Defines an anonymous uuid type.
-    */
+   * Defines an anonymous uuid type.
+   */
   val Anonymous: UuidType = value("ANONYMOUS")
 
   /**
-    * Defines the uuid type for invitation type.
-    */
+   * Defines the uuid type for tenant type.
+   */
+  val Tenant: UuidType = value("TENANT")
+
+  /**
+   * Defines the uuid type for workspace type.
+   */
+  val Workspace: UuidType = value("WORKSPACE")
+
+  /**
+   * Defines the uuid type for invitation type.
+   */
   val Invitation: UuidType = value("INVITATION")
 
   /**
-    * Defines the uuid type for user type.
-    */
+   * Defines the uuid type for user type.
+   */
   val User: UuidType = value("USER")
 }

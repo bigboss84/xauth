@@ -1,22 +1,24 @@
 package io.xauth.service.auth
 
-import java.time.LocalDateTime
-import java.time.ZoneOffset.UTC
-import java.util.Date
-
 import io.xauth.Uuid
 import io.xauth.config.ApplicationConfiguration
 import io.xauth.service.auth.model.AuthRefreshToken
-import io.xauth.service.mongo.MongoDbClient
-import javax.inject.{Inject, Singleton}
+import io.xauth.service.mongo.{MongoDbClient, WorkspaceCollection}
+import io.xauth.service.workspace.model.Workspace
 import play.api.Logger
-import reactivemongo.bson.BSONDocument
+import play.api.libs.json.Json
+import reactivemongo.play.json.compat._
+import reactivemongo.play.json.compat.json2bson.toDocumentWriter
 
+import java.time.LocalDateTime
+import java.time.ZoneOffset.UTC
+import java.util.Date
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * Handles business logic for refresh tokens.
-  */
+ * Handles business logic for refresh tokens.
+ */
 @Singleton
 class AuthRefreshTokenService @Inject()
 (
@@ -25,41 +27,42 @@ class AuthRefreshTokenService @Inject()
 )
 (implicit ec: ExecutionContext) {
 
+  private val logger: Logger = Logger(this.getClass)
+
   /**
-    * Finds refresh token.
-    *
-    * @param token Token to search.
-    * @return Returns [[Some(AuthRefreshToken)]] if the token was found.
-    */
-  def find(token: String): Future[Option[AuthRefreshToken]] = {
-    require(token.length > 0, "token length must not be empty")
+   * Finds refresh token.
+   *
+   * @param token Token to search.
+   * @return Returns [[Some(AuthRefreshToken)]] if the token was found.
+   */
+  def find(token: String)(implicit w: Workspace): Future[Option[AuthRefreshToken]] = {
+    require(token.nonEmpty, "token must not be empty")
 
-    mongo.collections.authRefreshToken.flatMap {
-      _.find(BSONDocument("_id" -> token), None).one[AuthRefreshToken]
+    mongo.collection(WorkspaceCollection.AuthRefreshToken) flatMap {
+      _.find(Json.obj("_id" -> token), None).one[AuthRefreshToken]
     }
   }
 
-  def delete(token: String): Unit = {
-    require(token.length > 0, "token length must not be empty")
+  def delete(token: String)(implicit w: Workspace): Unit = {
+    require(token.nonEmpty, "token must not be empty")
 
-    mongo.collections.authRefreshToken.flatMap {
-      _.findAndRemove(BSONDocument("token" -> token)).map(_.result[AuthRefreshToken])
+    mongo.collection(WorkspaceCollection.AuthRefreshToken) flatMap {
+      _.findAndRemove(Json.obj("token" -> token)).map(_.result[AuthRefreshToken])
     }
   }
 
-  def deleteAllExpired(): Unit = {
+  def deleteAllExpired(implicit w: Workspace): Unit = {
     val now = Date.from(LocalDateTime.now.toInstant(UTC))
 
-    mongo.collections.authRefreshToken.flatMap {
+    mongo.collection(WorkspaceCollection.AuthRefreshToken) flatMap {
       _.delete(ordered = false)
-        .one(BSONDocument("expiresAt" -> BSONDocument("$lt" -> now)))
-        .map(_ => {})
+        .one(Json.obj("expiresAt" -> Json.obj("$lt" -> now)))
     }
   }
 
-  def save(token: String, clientId: String, userId: Uuid): Unit = {
-    require(token.length > 0, "token length must not be empty")
-    require(clientId.length > 0, "client-id length must not be empty")
+  def save(token: String, clientId: String, userId: Uuid)(implicit w: Workspace): Unit = {
+    require(token.nonEmpty, "token must not be empty")
+    require(clientId.nonEmpty, "client-id must not be empty")
     require(userId != null, "user-id must not be null")
 
     val now = LocalDateTime.now()
@@ -74,12 +77,12 @@ class AuthRefreshTokenService @Inject()
       registeredAt = Date.from(registeredAt)
     )
 
-    val writeRes = mongo.collections.authRefreshToken.flatMap {
-      _.insert(authRefreshToken)
+    val writeRes = mongo.collection(WorkspaceCollection.AuthRefreshToken) flatMap {
+      _.insert.one(authRefreshToken)
     }
 
     writeRes.failed.foreach {
-      e => Logger.error(s"unable to write refresh token: ${e.getMessage}")
+      e => logger.error(s"unable to write refresh token: ${e.getMessage}")
     }
 
     writeRes.map(_ => {})

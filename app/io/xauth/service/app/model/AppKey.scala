@@ -2,14 +2,14 @@ package io.xauth.service.app.model
 
 import io.xauth.model.serial.EnumReads.enumNameReads
 import io.xauth.model.serial.EnumWrites.enumNameWrites
-import io.xauth.service.mongo.BsonHandlers.enumBsonHandler
+import io.xauth.service.mongo.BsonHandlers._
 import it.russoft.xenum.Enum
 import play.api.libs.json.{Reads, Writes}
-import reactivemongo.bson.{BSONHandler, BSONString}
+import reactivemongo.api.bson.BSONHandler
 
 /**
-  * Defines application configuration key.
-  */
+ * Defines application configuration key.
+ */
 object AppKey extends Enum {
   type AppKey = EnumVal
 
@@ -21,5 +21,5 @@ object AppKey extends Enum {
   implicit val writes: Writes[AppKey] = enumNameWrites
 
   // Bson serialization
-  implicit val bsonHandler: BSONHandler[BSONString, AppKey] = enumBsonHandler(AppKey)
+  implicit val bsonHandler: BSONHandler[AppKey] = enumBsonHandler(AppKey)
 }

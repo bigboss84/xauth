@@ -2,24 +2,26 @@ package io.xauth.service
 
 import io.xauth.config.ApplicationConfiguration
 import io.xauth.config.MailServiceType.WebService
-import javax.inject.{Inject, Singleton}
 import org.apache.commons.mail.SimpleEmail
 import play.api.Logger
 import play.api.libs.ws.WSAuthScheme.BASIC
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 /**
-  * Messaging client.
-  */
+ * Messaging client.
+ */
 @Singleton
 class MessagingClient @Inject()
 (
   ws: WSClient, conf: ApplicationConfiguration
 )
 (implicit ec: ExecutionContext) {
+
+  private val logger: Logger = Logger(this.getClass)
 
   private val serviceBaseUrl = s"${conf.mailService.schema}://${conf.mailService.host}"
 
@@ -42,15 +44,16 @@ class MessagingClient @Inject()
         .post("")
         .onComplete {
           case Success(s) =>
-            Logger.info(s"email dispatched for $to")
-            Logger.info(s"email service response: ${s.statusText}")
-          case Failure(e) => Logger.error(s"error during sending email: ${e.getMessage}")
+            logger.info(s"email dispatched for $to")
+            logger.info(s"email service response: ${s.statusText}")
+          case Failure(e) => logger.error(s"error during sending email: ${e.getMessage}")
         }
     }
 
     // SMTP
-    else Future {
-      Logger.info(s"sending email to $to...")
+    // todo: handle retries
+    else Try {
+      logger.info(s"sending email to $to...")
 
       val email = new SimpleEmail
 
@@ -69,7 +72,7 @@ class MessagingClient @Inject()
       email.setDebug(conf.mailDebug)
       email.send
 
-      Logger.info(s"email sent to $to")
+      logger.info(s"email sent to $to")
     }
   }
 

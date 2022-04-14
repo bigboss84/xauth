@@ -2,23 +2,26 @@ package io.xauth.web.controller.auth
 
 import akka.actor.ActorRef
 import io.xauth.JsonSchemaLoader
+import io.xauth.actor.AccountDeletionActor.DeleteUserMessage
+import io.xauth.actor.ContactTrustActor.ContactTrustMessage
+import io.xauth.actor.PasswordResetActor.PasswordResetMessage
 import io.xauth.config.ApplicationConfiguration
 import io.xauth.model.ContactType.Email
 import io.xauth.service.auth.model.AuthCodeType
 import io.xauth.service.auth.model.AuthStatus.{Blocked, Enabled}
 import io.xauth.service.auth.model.AuthUser.checkWithSalt
 import io.xauth.service.auth.{AuthAccessAttemptService, AuthCodeService, AuthRefreshTokenService, AuthUserService}
+import io.xauth.service.workspace.model.Workspace
 import io.xauth.util.Implicits._
-import io.xauth.util.{JwkService, JwtService}
-import io.xauth.web.action.auth.JwtAuthenticationAction._
-import io.xauth.web.action.auth.model.{BasicRequest, UserRequest}
-import io.xauth.web.action.auth.{BasicAuthenticationAction, JwtAuthenticationAction}
+import io.xauth.util.JwtService
+import io.xauth.web.action.auth.AuthenticationManager
+import io.xauth.web.action.auth.UserAuthenticationRefiner._
 import io.xauth.web.controller.auth.model.TokenStatus.{Invalid, TokenStatus, Valid}
 import io.xauth.web.controller.auth.model._
 import io.xauth.web.controller.users.model.UserRes._
 import play.api.Logger
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import play.api.mvc._
 
 import java.time.LocalDateTime
 import java.time.ZoneOffset.UTC
@@ -35,10 +38,8 @@ class AuthController @Inject()
   authAccessAttemptService: AuthAccessAttemptService,
   authCodeService: AuthCodeService,
   authRefreshTokenService: AuthRefreshTokenService,
-  basicAuthAction: BasicAuthenticationAction,
-  jwtAuthAction: JwtAuthenticationAction,
-  jwtHelper: JwtService,
-  jwkService: JwkService,
+  auth: AuthenticationManager,
+  jwtService: JwtService,
   jsonSchema: JsonSchemaLoader,
   conf: ApplicationConfiguration,
   @Named("account-deletion") accountDeletionActor: ActorRef,
@@ -50,27 +51,26 @@ class AuthController @Inject()
 
   private val logger = Logger(this.getClass)
 
-  private val jwtUserAction = jwtAuthAction andThen userAction
-
   private def status(s: Status)(m: String) = s(Json.obj("message" -> m))
 
   private def forbidden(m: String) = status(Forbidden)(m)
 
   private def badRequest(m: String) = status(BadRequest)(m)
 
-  def jwk: Action[AnyContent] = Action.async {
-    r =>
-      def keys = (ks: List[JsValue]) => Json.obj("keys" -> JsArray(ks))
+  def jwk: Action[AnyContent] = auth.WorkspaceAction.async { r =>
+    implicit val workspace: Workspace = r.workspace
 
-      jwkService.jwk match {
-        case Some(jwk) => successful(Ok(keys(Json.parse(jwk.toJSONString) :: Nil)))
-        case _ => successful(badRequest("No JWKs available"))
-      }
+    def keys = (ks: List[JsValue]) => Json.obj("keys" -> JsArray(ks))
+
+    jwtService.jwk match {
+      case Some(jwk) => successful(Ok(keys(Json.parse(jwk.toJSONString) :: Nil)))
+      case _ => successful(badRequest("No JWKs available"))
+    }
   }
 
-  def token: Action[JsValue] = basicAuthAction.async(parse.json) {
-    r =>
-      val request = r.asInstanceOf[BasicRequest[JsValue]]
+  def token: Action[JsValue] = auth.BasicAction.async(parse.json) {
+    request =>
+      implicit val workspace: Workspace = request.workspace
 
       // json schema validation
       jsonSchema.TokenPost.validate(request.body) match {
@@ -91,10 +91,10 @@ class AuthController @Inject()
                   // creating new bearer token
 
                   val tokenRes = TokenRes(
-                    jwtHelper.jwtTokenType,
-                    jwtHelper.createToken(authUser.id, authUser.roles, authUser.applications),
-                    jwtHelper.jwtExpirationInMinutes,
-                    jwtHelper.createRefreshToken
+                    JwtService.TokenType,
+                    jwtService.createToken(authUser.id, workspace.id, authUser.roles, authUser.applications),
+                    JwtService.accessTokenExpiration,
+                    JwtService.createRefreshToken
                   )
 
                   logger.info(s"created access-token: ${tokenRes.accessToken}")
@@ -113,14 +113,14 @@ class AuthController @Inject()
                 } else {
                   // wrong password
                   // storing login attempt
-                  authAccessAttemptService.save(body.username, request.credentials.id, request.remoteAddress).map { a =>
+                  authAccessAttemptService.save(body.username, request.credentials.id, request.remoteAddress).map { _ =>
                     authAccessAttemptService.findAllByUsername(body.username) onComplete {
                       case Success(n) if n >= conf.maxLoginAttempts =>
                         authService.updateStatusByUsername(body.username, Blocked)
                       case Success(n) =>
-                        Logger.warn(s"access attempt number $n for user ${body.username}")
+                        logger.warn(s"access attempt number $n for user ${body.username}")
                       case Failure(e) =>
-                        Logger.error(s"error counting access attempts: ${e.getMessage}")
+                        logger.error(s"error counting access attempts: ${e.getMessage}")
                     }
                   }
 
@@ -138,21 +138,20 @@ class AuthController @Inject()
       }
   }
 
-  def check: Action[AnyContent] = Action { request =>
+  def check: Action[AnyContent] = auth.WorkspaceAction { request =>
+    implicit val workspace: Workspace = request.workspace
+
     def status = (s: TokenStatus) => Json.obj("tokenStatus" -> s)
 
-    request.token.map {
-      token =>
-        jwtHelper.decodeToken(token).fold(
-          _ => Ok(status(Invalid)),
-          _ => Ok(status(Valid))
-        )
+    request.token.map { token =>
+      val s = jwtService.decodeToken(token).fold(_ => Invalid, _ => Valid)
+      Ok(status(s))
     } getOrElse BadRequest
   }
 
-  def refresh: Action[JsValue] = basicAuthAction.async(parse.json) {
-    r =>
-      val request = r.asInstanceOf[BasicRequest[JsValue]]
+  def refresh: Action[JsValue] = auth.BasicAction.async(parse.json) {
+    request =>
+      implicit val workspace: Workspace = request.workspace
 
       // json schema validation
       jsonSchema.RefreshPost.validate(request.body) match {
@@ -174,9 +173,9 @@ class AuthController @Inject()
                       if (authUser.status == Enabled) {
                         // generating new access token
                         Ok(Json.toJson(TokenRes(
-                          jwtHelper.jwtTokenType,
-                          jwtHelper.createToken(authRefreshToken.userId, authUser.roles, authUser.applications),
-                          jwtHelper.jwtExpirationInMinutes,
+                          JwtService.TokenType,
+                          jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, authUser.applications),
+                          JwtService.refreshTokenExpiration,
                           authRefreshToken.token
                         )))
                       }
@@ -202,10 +201,13 @@ class AuthController @Inject()
       }
   }
 
-  def passwordForgotten: Action[JsValue] = Action.async(parse.json) { r =>
+  def passwordForgotten: Action[JsValue] = auth.WorkspaceAction.async(parse.json) { request =>
+    implicit val workspace: Workspace = request.workspace
+
     // json schema validation
-    jsonSchema.PasswordForgotten.validateObj[PasswordForgottenReq](r.body) match {
+    jsonSchema.PasswordForgotten.validateObj[PasswordForgottenReq](request.body) match {
       case s: JsSuccess[PasswordForgottenReq] =>
+
         val reset = s.value
         authService.findByUsername(reset.username) map {
           case Some(u) =>
@@ -214,7 +216,7 @@ class AuthController @Inject()
               u.userInfo.contacts.find(c => c.`type` == Email && c.trusted) match {
                 case Some(email) =>
                   // generating reset code
-                  passwordResetActor ! u
+                  passwordResetActor ! PasswordResetMessage(u)
                   status(Accepted)(s"reset code will send to '${email.value.mask}'")
                 case _ =>
                   status(BadRequest)("no trusted email was found")
@@ -230,10 +232,12 @@ class AuthController @Inject()
     }
   }
 
-  def passwordReset: Action[JsValue] = Action.async(parse.json) { r =>
+  def passwordReset: Action[JsValue] = auth.WorkspaceAction.async(parse.json) { r =>
     // json schema validation
     jsonSchema.PasswordReset.validateObj[PasswordResetReq](r.body) match {
       case s: JsSuccess[PasswordResetReq] =>
+        implicit val workspace: Workspace = r.workspace
+
         val reset = s.value
         if (reset.password == reset.passwordCheck) {
           authCodeService.find(reset.code) flatMap {
@@ -262,12 +266,13 @@ class AuthController @Inject()
   /**
     * Performs a user account deletion request sending confirmation code.
     */
-  def accountDeleteRequest: Action[AnyContent] = jwtUserAction.async { r =>
+  def accountDeleteRequest: Action[AnyContent] = auth.UserAction.async { r =>
+    implicit val workspace: Workspace = r.workspace
     // here the user must be enabled because
     r.authUser.userInfo.contacts.find(c => c.`type` == Email && c.trusted) match {
       case Some(email) =>
         // generating reset code
-        accountDeletionActor ! r.authUser
+        accountDeletionActor ! DeleteUserMessage(r.authUser)
         successful(status(Accepted)(s"deletion code will send to '${email.value.mask}'"))
       case _ =>
         successful(status(BadRequest)("no trusted email was found"))
@@ -277,11 +282,13 @@ class AuthController @Inject()
   /**
     * Deletes definitively the user account.
     */
-  def accountDeleteConfirmation: Action[JsValue] = jwtUserAction.async(parse.json) { r =>
+  def accountDeleteConfirmation: Action[JsValue] = auth.UserAction.async(parse.json) { r =>
     // here the user must be enabled because
     // json schema validation
     jsonSchema.AuthAccountDeleteConfirmationPost.validateObj[AccountDeleteConfirmationReq](r.body) match {
       case s: JsSuccess[AccountDeleteConfirmationReq] =>
+        implicit val workspace: Workspace = r.workspace
+
         val delete = s.value
         authCodeService.find(delete.code) flatMap {
           case Some(authCode) if authCode.`type` == AuthCodeType.Deletion =>
@@ -299,19 +306,20 @@ class AuthController @Inject()
     }
   }
 
-  def user: Action[AnyContent] = jwtAuthAction.async { r =>
-    val request = r.asInstanceOf[UserRequest[_]]
-
-    authService.findById(request.authUser.id).map {
+  def user: Action[AnyContent] = auth.UserAction.async { r =>
+    implicit val w: Workspace = r.workspace
+    authService.findById(r.authUser.id) map {
       case Some(u) => Ok(Json.toJson(u.toResource))
       case _ => NotFound
     }
   }
 
-  def activation: Action[JsValue] = Action.async(parse.json) { request =>
+  def activation: Action[JsValue] = auth.WorkspaceAction.async(parse.json) { r =>
     // json schema validation
-    jsonSchema.AuthActivationPost.validate(request.body) match {
+    jsonSchema.AuthActivationPost.validate(r.body) match {
       case JsSuccess(value, _) =>
+        implicit val workspace: Workspace = r.workspace
+
         val code = (value \\ "code").head.asInstanceOf[JsString].value
         authCodeService.find(code).map {
           case Some(c) =>
@@ -331,18 +339,18 @@ class AuthController @Inject()
   /**
     * Accepts trust requests for the user contact.
     */
-  def contactTrust: Action[JsValue] = jwtAuthAction.async(parse.json) { r =>
+  def contactTrust: Action[JsValue] = auth.UserAction.async(parse.json) { r =>
     // json schema validation
     jsonSchema.AuthContactTrustPost.validateObj[ContactTrustReq](r.body) match {
       case s: JsSuccess[ContactTrustReq] =>
-        val request = r.asInstanceOf[UserRequest[_]]
-        val u = request.authUser
+        implicit val workspace: Workspace = r.workspace
+        val u = r.authUser
         u.userInfo.contacts.find(_.value == s.value.contact) match {
           case Some(c) =>
             if (c.trusted) successful(BadRequest(Json.obj("message" -> "contact is already trusted")))
             else {
               // generating trust code
-              contactTrustActor ! (u, c)
+              contactTrustActor ! ContactTrustMessage(u, c)
               successful {
                 status(Accepted)(s"trust code will send to '${c.value.mask}'")
               }
@@ -357,10 +365,12 @@ class AuthController @Inject()
   /**
     * Trusts requests for mark user contact as trusted.
     */
-  def contactActivation: Action[JsValue] = jwtAuthAction.async(parse.json) { r =>
+  def contactActivation: Action[JsValue] = auth.UserAction.async(parse.json) { r =>
     // json schema validation
     jsonSchema.AuthContactActivationPost.validate(r.body) match {
       case JsSuccess(value, _) =>
+        implicit val workspace: Workspace = r.workspace
+
         val code = (value \\ "code").head.asInstanceOf[JsString].value
         authCodeService.find(code).map {
           case Some(c) =>

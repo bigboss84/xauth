@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/system/workspaces",
+  "type": "object",
+  "properties": {
+    "tenantId": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Uuid",
+      "description": "Tenant identifier"
+    },
+    "slug": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/NameSlug",
+      "description": "Name in slug format"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description"
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "dbUri": {
+          "type": "string",
+          "description": "URI of the persistence system"
+        },
+        "jwt": {
+          "type": "object",
+          "properties": {
+            "expiration": {
+              "type": "object",
+              "properties": {
+                "accessToken": {
+                  "type": "integer",
+                  "description": "Access token expiration (in seconds)",
+                  "default": 1800
+                },
+                "refreshToken": {
+                  "type": "integer",
+                  "description": "Refresh token expiration (in hours)",
+                  "default": 12
+                }
+              },
+              "required": [
+                "accessToken",
+                "refreshToken"
+              ],
+              "additionalProperties": false
+            },
+            "encryption": {
+              "type": "object",
+              "description": "Token encryption settings",
+              "properties": {
+                "algorithm": {
+                  "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/TokenAlgorithm",
+                  "description": "Asymmetric/Symmetric algorithm type"
+                }
+              },
+              "required": [
+                "algorithm"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "expiration",
+            "encryption"
+          ],
+          "additionalProperties": false
+        },
+        "zoneId": {
+          "$ref": "{baseUrl}/public/schema/v1/timezone.json#/definitions/ZoneId",
+          "description": "Zone identifier"
+        }
+      },
+      "required": [
+        "dbUri",
+        "jwt",
+        "zoneId"
+      ],
+      "additionalProperties": false
+    },
+    "init": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "type": "object",
+          "description": "Initial client for http-basic authentication",
+          "properties": {
+            "id": {
+              "$ref": "{baseUrl}/public/schema/v1/admin/clients/common.json#/definitions/ClientId",
+              "description": "The client identifier"
+            },
+            "secret": {
+              "$ref": "{baseUrl}/public/schema/v1/admin/clients/common.json#/definitions/ClientSecret",
+              "description": "The secret for authentication"
+            }
+          },
+          "required": [
+            "id",
+            "secret"
+          ],
+          "additionalProperties": false
+        },
+        "admin": {
+          "type": "object",
+          "description": "Administrator user definition",
+          "properties": {
+            "username": {
+              "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Username",
+              "description": "Username"
+            },
+            "password": {
+              "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Password",
+              "description": "Password"
+            }
+          },
+          "required": [
+            "username",
+            "password"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "client",
+        "admin"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "tenantId",
+    "slug",
+    "description",
+    "configuration",
+    "init"
+  ],
+  "additionalProperties": false
+}

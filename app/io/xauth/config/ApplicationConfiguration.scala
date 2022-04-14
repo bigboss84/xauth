@@ -1,15 +1,14 @@
 package io.xauth.config
 
-import java.io.File
-
 import io.xauth.config.InvitationCodeNotification.{Auto, InvitationCodeNotification, Manual}
-import io.xauth.util.Implicits._
-import io.xauth.util.JwtService
-import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ApplicationConfiguration @Inject()(conf: Configuration) {
+
+  private val logger: Logger = Logger(this.getClass)
 
   val baseUrl: String = conf.get[String]("baseUrl")
 
@@ -18,44 +17,10 @@ class ApplicationConfiguration @Inject()(conf: Configuration) {
   val taskTokenCleanInterval: Int = conf.get[Int]("task.tokenClean.interval")
 
   // Json Web Token
+  val jwtSecretKeyPath: String = conf.get[String]("jwt.secretKey.path")
   val jwtExpirationAccessToken: Int = conf.get[Int]("jwt.expiration.accessToken")
 
   val jwtAlgorithm: String = conf.get[String]("jwt.secretKey.algorithm")
-  val jwtAsymmetricAlgorithm: Boolean = JwtService.isAsymmetricAlgorithm(jwtAlgorithm)
-  val jwtSymmetricAlgorithm: Boolean = !jwtAsymmetricAlgorithm
-
-  val jwtSymmetricKey: Option[SymmetricKey] = {
-    if (jwtSymmetricAlgorithm) Some {
-      val path = conf.get[String]("jwt.secretKey.path")
-      val name = conf.get[String]("jwt.secretKey.name")
-      val file = new File(path, name)
-
-      val bytes =
-        if (file.exists) file.bytes
-        else {
-          val value = conf.get[String]("jwt.secretKey.value")
-          val rgx = "^(?=(.*\\d){3,})(?=(.*[a-z]){3,})(?=.*[A-Z])(?=.*[@#$%^&+=-_.:])(?=\\S+$).{8,}$".r
-
-          if (rgx.findFirstMatchIn(value) isEmpty)
-            Logger.warn("your jwt secret key is insecure, change it!")
-
-          value.getBytes
-        }
-
-      SymmetricKey(name, bytes)
-    } else None
-  }
-
-  val jwtAsymmetricKey: Option[AsymmetricKey] = {
-    if (jwtAsymmetricAlgorithm) Some {
-      val path = conf.get[String]("jwt.secretKey.path")
-      val name = conf.get[String]("jwt.secretKey.name")
-      val pvtBytes = new File(path, s"$name-rsa.private.der").bytes
-      val pubBytes = new File(path, s"$name-rsa.public.der").bytes
-      AsymmetricKey(name, pvtBytes, pubBytes)
-    }
-    else None
-  }
 
   val jwtExpirationRefreshToken: Int = conf.get[Int]("jwt.expiration.refreshToken")
 

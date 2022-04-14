@@ -1,9 +1,9 @@
 package io.xauth.web.controller
 
-import akka.actor.ActorRef
-import io.xauth.service.auth.AuthUserService
-import javax.inject.{Inject, Named, Singleton}
 import play.api.mvc.{AbstractController, ControllerComponents}
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 
 /**
   * Temporary test controller to manually trigger some actions.
@@ -11,10 +11,8 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 @Singleton
 class TestController @Inject()
 (
-  @Named("account-activator") accountActivatorActor: ActorRef,
-  authService: AuthUserService,
   cc: ControllerComponents
-) extends AbstractController(cc) {
+)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def test = Action { request =>
     Ok

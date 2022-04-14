@@ -5,9 +5,12 @@ import io.xauth.model.UserContact
 import io.xauth.service.auth.model.AuthCode
 import io.xauth.service.auth.model.AuthCode.generateCode
 import io.xauth.service.auth.model.AuthCodeType.AuthCodeType
-import io.xauth.service.mongo.MongoDbClient
+import io.xauth.service.mongo.{MongoDbClient, WorkspaceCollection}
+import io.xauth.service.workspace.model.Workspace
 import play.api.Logger
-import reactivemongo.bson.BSONDocument
+import play.api.libs.json.Json
+import reactivemongo.play.json.compat._
+import reactivemongo.play.json.compat.json2bson.toDocumentWriter
 
 import java.time.Duration.ofHours
 import java.time.LocalDateTime
@@ -18,8 +21,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * Service that handles for authentication codes.
-  */
+ * Service that handles for authentication codes.
+ */
 @Singleton
 class AuthCodeService @Inject()
 (
@@ -27,63 +30,65 @@ class AuthCodeService @Inject()
 )
 (implicit ec: ExecutionContext) {
 
-  def find(code: String): Future[Option[AuthCode]] = {
-    require(code != null, "code must not be null")
+  private val logger: Logger = Logger(this.getClass)
 
-    mongo.collections.authCode.flatMap {
-      _.find(BSONDocument("_id" -> code), None).one[AuthCode]
+  def find(code: String)(implicit w: Workspace): Future[Option[AuthCode]] = {
+    require(code.nonEmpty, "code must not be null")
+
+    mongo.collection(WorkspaceCollection.AuthCode) flatMap {
+      _.find(Json.obj("_id" -> code), None).one[AuthCode]
     }
   }
 
-  def find(code: String, codeType: AuthCodeType): Future[Option[AuthCode]] = {
-    require(code != null, "code must not be null")
+  def find(code: String, codeType: AuthCodeType)(implicit w: Workspace): Future[Option[AuthCode]] = {
+    require(code.nonEmpty, "code must not be null")
     require(codeType != null, "code-type must not be null")
 
-    mongo.collections.authCode.flatMap {
-      _.find(BSONDocument("_id" -> code, "type" -> codeType), None).one[AuthCode]
+    mongo.collection(WorkspaceCollection.AuthCode) flatMap {
+      _.find(Json.obj("_id" -> code, "type" -> codeType), None).one[AuthCode]
     }
   }
 
-  def find(referenceId: Uuid, codeType: AuthCodeType): Future[Option[AuthCode]] = {
+  def find(referenceId: Uuid, codeType: AuthCodeType)(implicit w: Workspace): Future[Option[AuthCode]] = {
     require(referenceId != null, "reference-id must not be null")
     require(codeType != null, "code-type must not be null")
 
-    mongo.collections.authCode.flatMap {
-      _.find(BSONDocument("referenceId" -> referenceId, "type" -> codeType), None).one[AuthCode]
+    mongo.collection(WorkspaceCollection.AuthCode) flatMap {
+      _.find(Json.obj("referenceId" -> referenceId, "type" -> codeType), None).one[AuthCode]
     }
   }
 
-  def delete(code: String): Unit = {
-    require(code != null, "code must not be null")
+  def delete(code: String)(implicit w: Workspace): Unit = {
+    require(code.nonEmpty, "code must not be null")
 
-    mongo.collections.authCode.flatMap {
+    mongo.collection(WorkspaceCollection.AuthCode) flatMap {
       _.delete(ordered = false)
-        .one(BSONDocument("_id" -> code))
+        .one(Json.obj("_id" -> code))
         .map(_ => {})
     }
   }
 
-  def deleteAllExpired(): Unit = {
+  def deleteAllExpired(implicit w: Workspace): Unit = {
     val now = Date.from(LocalDateTime.now.toInstant(UTC))
 
-    mongo.collections.authCode.flatMap {
+    mongo.collection(WorkspaceCollection.AuthCode) flatMap {
       _.delete(ordered = false)
-        .one(BSONDocument("expiresAt" -> BSONDocument("$lt" -> now)))
+        .one(Json.obj("expiresAt" -> Json.obj("$lt" -> now)))
         .map(_ => {})
     }
   }
 
-  def save(codeType: AuthCodeType, referenceId: Uuid, userContact: Option[UserContact]): Future[AuthCode] =
+  def save(codeType: AuthCodeType, referenceId: Uuid, userContact: Option[UserContact])(implicit w: Workspace): Future[AuthCode] =
     save(codeType, generateCode, referenceId, userContact, Left(ofHours(1)))
 
   /**
-    * Generates a shared code.
-    *
-    * @param codeType    the type of code.
-    * @param referenceId the reference id that the generated code refers to.
-    * @return Returns a [[Future]] that will contains just created activation code.
-    */
-  def save(codeType: AuthCodeType, code: String, referenceId: Uuid, userContact: Option[UserContact], validity: Either[TemporalAmount, Date]): Future[AuthCode] = {
+   * Generates a shared code.
+   *
+   * @param codeType    the type of code.
+   * @param referenceId the reference id that the generated code refers to.
+   * @return Returns a [[Future]] that will contains just created activation code.
+   */
+  def save(codeType: AuthCodeType, code: String, referenceId: Uuid, userContact: Option[UserContact], validity: Either[TemporalAmount, Date])(implicit w: Workspace): Future[AuthCode] = {
     require(codeType != null, "codeType must not be null")
     require(referenceId != null, "referenceId must not be null")
 
@@ -103,12 +108,12 @@ class AuthCodeService @Inject()
       Date.from(registeredAt)
     )
 
-    val writeRes = mongo.collections.authCode.flatMap {
-      _.insert(authCode)
+    val writeRes = mongo.collection(WorkspaceCollection.AuthCode) flatMap {
+      _.insert.one(authCode)
     }
 
     writeRes.failed.foreach {
-      e => Logger.error(s"unable to write auth code: ${e.getMessage}")
+      e => logger.error(s"unable to write auth code: ${e.getMessage}")
     }
 
     writeRes.map { _ => authCode }

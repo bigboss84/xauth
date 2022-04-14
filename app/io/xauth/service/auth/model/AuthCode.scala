@@ -1,12 +1,12 @@
 package io.xauth.service.auth.model
 
-import java.util.Date
-
 import io.xauth.Uuid
 import io.xauth.model.{DataFormat, UserContact}
 import io.xauth.service.auth.model.AuthCodeType.AuthCodeType
-import reactivemongo.bson.Macros.Annotations.Key
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.Macros.Annotations.Key
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+
+import java.util.Date
 
 case class AuthCode
 (
@@ -49,5 +49,6 @@ object AuthCode extends DataFormat {
       and (__ \ "registeredAt").write(dateWrites(iso8601DateFormat))
     ) (unlift(AuthCode.unapply))
 
+  import io.xauth.service.mongo.BsonHandlers._
   implicit val bsonDocumentHandler: BSONDocumentHandler[AuthCode] = Macros.handler[AuthCode]
 }

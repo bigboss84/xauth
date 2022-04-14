@@ -3,8 +3,7 @@ package io.xauth.web.controller.admin.roles
 import io.xauth.JsonSchemaLoader
 import io.xauth.service.auth.AuthUserService
 import io.xauth.service.auth.model.AuthRole.Admin
-import io.xauth.web.action.auth.JwtAuthenticationAction
-import io.xauth.web.action.auth.JwtAuthenticationAction.{roleAction, userAction}
+import io.xauth.web.action.auth.AuthenticationManager
 import play.api.libs.json.{JsError, JsSuccess, JsValue}
 import play.api.mvc.{AbstractController, Action, ControllerComponents}
 
@@ -18,7 +17,7 @@ import scala.concurrent.Future.successful
 @Singleton
 class RoleController @Inject()
 (
-  jwtAuthAction: JwtAuthenticationAction,
+  auth: AuthenticationManager,
   jsonSchema: JsonSchemaLoader,
   authUserService: AuthUserService,
   cc: ControllerComponents
@@ -26,8 +25,7 @@ class RoleController @Inject()
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   // admin authenticated composed action
-  private val adminAction =
-    jwtAuthAction andThen userAction andThen roleAction(Admin)
+  private val adminAction = auth.RoleAction(Admin)
 
   def create: Action[JsValue] = adminAction.async(parse.json) { request =>
     // json schema validation

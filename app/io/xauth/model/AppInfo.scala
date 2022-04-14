@@ -1,11 +1,11 @@
 package io.xauth.model
 
 import io.xauth.model.Permission.Permission
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
 
 /**
-  * Defines application information
-  */
+ * Defines application information
+ */
 case class AppInfo
 (
   name: String,

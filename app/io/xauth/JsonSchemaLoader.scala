@@ -20,11 +20,61 @@ class JsonSchemaLoader @Inject()(implicit val conf: ApplicationConfiguration, im
   val Common: JsonSchema =
     new JsonSchema("public/schema/v1/common.json")
 
+  val TimeZone: JsonSchema =
+    new JsonSchema("public/schema/v1/timezone.json")
+
   // Init
   val InitConfigurationPost: JsonSchema =
     new JsonSchema("public/schema/v1/init/configuration.post.req.json")
 
-  // Admin
+  // System: Tenants
+  val SystemTenantPost: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenant.post.req.json")
+
+  val SystemTenantPostRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenant.post.res.json")
+
+  val SystemTenantsGetRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenants.get.res.json")
+
+  val SystemTenantGetRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenant.get.res.json")
+
+  val SystemTenantPut: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenant.put.req.json")
+
+  val SystemTenantPutRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/tenants/tenant.put.res.json")
+
+  // System: Workspace
+  val SystemWorkspaceCommon: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/common.json")
+
+  val SystemWorkspacePost: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspace.post.req.json")
+
+  val SystemWorkspacePostRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspace.post.res.json")
+
+  val SystemWorkspacesGetRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspaces.get.res.json")
+
+  val SystemWorkspaceGetRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspace.get.res.json")
+
+  val SystemWorkspacePut: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspace.put.req.json")
+
+  val SystemWorkspacePutRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/workspace.put.res.json")
+
+  val SystemWorkspaceStatusPatch: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/status.patch.req.json")
+
+  val SystemWorkspaceStatusPatchRes: JsonSchema =
+    new JsonSchema("public/schema/v1/system/workspaces/status.patch.res.json")
+
+  // Admin: Users, Clients and Application
   val AdminUsersPost: JsonSchema =
     new JsonSchema("public/schema/v1/admin/users/users.post.req.json")
 
@@ -152,10 +202,25 @@ class JsonSchemaLoader @Inject()(implicit val conf: ApplicationConfiguration, im
   val values: Seq[JsonSchema] = Seq(
     // app
     Common,
+    TimeZone,
     InvitationsCommon,
 
     // Init
     InitConfigurationPost,
+
+    // system: tenant
+    SystemTenantPost, SystemTenantPostRes,
+    SystemTenantsGetRes,
+    SystemTenantGetRes,
+    SystemTenantPut, SystemTenantPutRes,
+
+    // system: workspace
+    SystemWorkspaceCommon,
+    SystemWorkspacePost, SystemWorkspacePostRes,
+    SystemWorkspacesGetRes,
+    SystemWorkspaceGetRes,
+    SystemWorkspacePut, SystemWorkspacePutRes,
+    SystemWorkspaceStatusPatch, SystemWorkspaceStatusPatchRes,
 
     // admin: user
     AdminUsersPost,

@@ -5,43 +5,48 @@ import io.xauth.model.serial.EnumWrites.enumNameWrites
 import io.xauth.service.mongo.BsonHandlers.enumBsonHandler
 import it.russoft.xenum.Enum
 import play.api.libs.json.{Reads, Writes}
-import reactivemongo.bson.{BSONHandler, BSONString}
+import reactivemongo.api.bson.BSONHandler
 
 /**
-  * Defines all recognized and handled user roles.
-  */
+ * Defines all recognized and handled user roles.
+ */
 object AuthRole extends Enum {
   type AuthRole = EnumVal
 
   /**
-    * Defines simple user role.
-    */
+   * Defines simple user role.
+   */
   val User: AuthRole = value("USER")
 
   /**
-    * Defines the human resource role.
-    */
+   * Defines the human resource role.
+   */
   val HumanResource: AuthRole = value("HR")
 
   /**
-    * Defines the help desk operator role.
-    */
+   * Defines the help desk operator role.
+   */
   val HelpDeskOperator: AuthRole = value("HD_OPERATOR")
 
   /**
-    * Defines the application responsible role.
-    */
+   * Defines the application responsible role.
+   */
   val Responsible: AuthRole = value("RESPONSIBLE")
 
   /**
-    * Defines the administrator role.
-    */
+   * Defines the administrator role.
+   */
   val Admin: AuthRole = value("ADMIN")
+
+  /**
+    * Defines the system root administrator role.
+    */
+  val System: AuthRole = value("SYSTEM")
 
   // Json serialization
   implicit val reads: Reads[AuthRole] = enumNameReads(AuthRole)
   implicit val writes: Writes[AuthRole] = enumNameWrites
 
   // Bson serialization
-  implicit val bsonHandler: BSONHandler[BSONString, AuthRole] = enumBsonHandler(AuthRole)
+  implicit val bsonHandler: BSONHandler[AuthRole] = enumBsonHandler(AuthRole)
 }

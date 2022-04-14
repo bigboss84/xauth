@@ -1,11 +1,10 @@
 package io.xauth.service.auth.model
 
 import java.util.Date
-
 import io.xauth.Uuid
 import io.xauth.model.DataFormat
-import reactivemongo.bson.Macros.Annotations.Key
-import reactivemongo.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.Macros.Annotations.Key
 
 case class AuthRefreshToken
 (
@@ -38,5 +37,6 @@ object AuthRefreshToken extends DataFormat {
       and (__ \ "registeredAt").write[Date]
     ) (unlift(AuthRefreshToken.unapply))
 
+  import io.xauth.service.mongo.BsonHandlers._
   implicit val bsonDocumentHandler: BSONDocumentHandler[AuthRefreshToken] = Macros.handler[AuthRefreshToken]
 }
