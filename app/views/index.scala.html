@@ -1,7 +1,36 @@
 @()
 
 @main("Welcome to X-Authentication Service") {
+  <header>
+    <img id="logo" src="@routes.Assets.versioned("images/xauth-logo.svg")" alt="XAuth logo" />
+  </header>
   <h1>It works!</h1>
-  <hr />
-  <pre>X-Authentication Service</pre>
+  <div id="welcome">Multi-tenant X-Authentication Service</div>
+  <table>
+    <tbody>
+      <tr><td><span class="title green-fg">Multi-tenancy</span><div class="desc dark-fg">Allows to handle multiple customers.</div></td></tr>
+      <tr><td><span class="title green-fg">Workspaces</span><div class="desc dark-fg">Workspaces are the main user containers, they belong to one tenant.</div></td></tr>
+      <tr><td><span class="title green-fg">System Tenant</span><div class="desc dark-fg">The first workspace container.</div></td></tr>
+      <tr><td><span class="title green-fg">System Workspace</span><div class="desc dark-fg">The first workspace container that makes the application ready to work.</div></td></tr>
+      <tr><td><span class="title green-fg">Data Isolation</span><div class="desc dark-fg">Each workspace stores all user data into dedicated database.</div></td></tr>
+      <tr><td><span class="title green-fg">Trusted Clients</span><div class="desc dark-fg">Multiple clients can be configured into a workspace and they allow to access to the REST APIs.</div></td></tr>
+      <tr><td><span class="title green-fg">JWT</span><div class="desc dark-fg">XAuth allows to handle the sign-in through the JSON Web Token (JWT) open standard (RFC 7519).</div></td></tr>
+      <tr><td><span class="title green-fg">JWK</span><div class="desc dark-fg">Support for JSON Web Key (JWK) open standard (RFC 7517).</div></td></tr>
+      <tr><td><span class="title green-fg">Multiple Encryption Algorithms</span><div class="desc dark-fg">XAuth supports HMAC, Asymmetric, RSA and ECDSA encryption algorithms: HMD5, HS224, HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384 and ES512.</div></td></tr>
+      <tr><td><span class="title green-fg">Configurable token durations</span><div class="desc dark-fg">Access and Refresh token durations can be configured at workspace level.</div></td></tr>
+      <tr><td><span class="title green-fg">Applications and Permissions</span><div class="desc dark-fg">Applications can be configured at workspace level to custom user accesses for your ecosystem.</div></td></tr>
+      <tr><td><span class="title green-fg">Applications</span><div class="desc dark-fg">Applications can be configured at workspace level to custom user accesses.</div></td></tr>
+      <tr><td><span class="title green-fg">SYSTEM Role</span><div class="desc dark-fg">Allows to recognise all system administrators that are enabled to create Tenants, Workspace and manage them.</div></td></tr>
+      <tr><td><span class="title green-fg">ADMIN Role</span><div class="desc dark-fg">Allows to recognise all workspace administrators, they can handle other user's grants.</div></td></tr>
+      <tr><td><span class="title green-fg">User lifecycle</span><div class="desc dark-fg">The system handle the user flows for registration, password reset and so on.</div></td></tr>
+      <tr><td><span class="title green-fg">REST APIs</span><div class="desc dark-fg">The system expose REST APIs with JSON format.</div></td></tr>
+      <tr><td><span class="title green-fg">Validated REST API's</span><div class="desc dark-fg">The system validates all request with JSON Schema, this allows to Front-end engineers to consult public exposed schema.</div></td></tr>
+    </tbody>
+  </table>
+  <footer>
+    <img class="footer-logo" src="@routes.Assets.versioned("images/scala-logo.svg")" alt="Scala logo" />
+    <img class="footer-logo" src="@routes.Assets.versioned("images/play-logo.svg")" alt="Play framework logo" />
+    <img class="footer-logo" src="@routes.Assets.versioned("images/akka-logo.svg")" alt="Akka toolkit logo" />
+    <br /><img class="footer-logo" src="@routes.Assets.versioned("images/mongodb-logo.svg")" alt="MongoDB logo" />
+  </footer>
 }
