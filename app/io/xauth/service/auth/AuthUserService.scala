@@ -12,6 +12,7 @@ import io.xauth.service.auth.model.AuthUser
 import io.xauth.service.auth.model.AuthUser.cryptWithSalt
 import io.xauth.service.mongo.{MongoDbClient, WorkspaceCollection}
 import io.xauth.service.workspace.model.Workspace
+import io.xauth.util.Implicits.FormattedDate
 import play.api.Logger
 import play.api.libs.json.Json
 import reactivemongo.api.{Collation, WriteConcern}
@@ -47,7 +48,7 @@ class AuthUserService @Inject()
    * @return Returns non-empty [[Some(User)]] if the user was found.
    */
   def findByUsername(username: String)(implicit w: Workspace): Future[Option[AuthUser]] = {
-    require(username != null, "username must not be null")
+    require(username.nonEmpty, "username must not be null")
 
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.find(Json.obj("username" -> username), None).one[AuthUser]
@@ -142,7 +143,7 @@ class AuthUserService @Inject()
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.findAndUpdate(
         Json.obj("_id" -> id),
-        Json.obj("$set" -> Json.obj("userInfo" -> userInfo, "updatedAt" -> now)),
+        Json.obj("$set" -> Json.obj("userInfo" -> userInfo, "updatedAt" -> now.toIso8601)),
         fetchNewObject = true
       ) map {
         _.result[AuthUser]
@@ -159,7 +160,7 @@ class AuthUserService @Inject()
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.findAndUpdate(
         Json.obj("_id" -> id),
-        Json.obj("$set" -> Json.obj("applications" -> applications.toList, "updatedAt" -> now)),
+        Json.obj("$set" -> Json.obj("applications" -> applications.toList, "updatedAt" -> now.toIso8601)),
         fetchNewObject = true
       ) map {
         _.result[AuthUser]
@@ -176,7 +177,7 @@ class AuthUserService @Inject()
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.findAndUpdate(
         Json.obj("_id" -> id),
-        Json.obj("$set" -> Json.obj("roles" -> roles.toList, "updatedAt" -> now)),
+        Json.obj("$set" -> Json.obj("roles" -> roles.toList, "updatedAt" -> now.toIso8601)),
         fetchNewObject = true
       ) map {
         _.result[AuthUser]
@@ -193,7 +194,7 @@ class AuthUserService @Inject()
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.findAndUpdate(
         Json.obj("_id" -> id),
-        Json.obj("$set" -> Json.obj("status" -> status, "updatedAt" -> now)),
+        Json.obj("$set" -> Json.obj("status" -> status, "updatedAt" -> now.toIso8601)),
         fetchNewObject = true
       ) map {
         _.result[AuthUser]
@@ -210,7 +211,7 @@ class AuthUserService @Inject()
     mongo.collection(WorkspaceCollection.AuthUser) flatMap {
       _.findAndUpdate(
         Json.obj("username" -> username),
-        Json.obj("$set" -> Json.obj("status" -> status, "updatedAt" -> now)),
+        Json.obj("$set" -> Json.obj("status" -> status, "updatedAt" -> now.toIso8601)),
       ) map {
         _.result[AuthUser]
       }
@@ -276,7 +277,7 @@ class AuthUserService @Inject()
           val update = Json.obj(
             "$set" -> Json.obj(
               "status" -> Enabled,
-              "updatedAt" -> now,
+              "updatedAt" -> now.toIso8601,
               "userInfo.contacts.$[elem].trusted" -> true
             )
           )
@@ -354,7 +355,7 @@ class AuthUserService @Inject()
             ),
             Json.obj(
               "$set" -> Json.obj(
-                "updatedAt" -> now,
+                "updatedAt" -> now.toIso8601,
                 "userInfo.contacts.$.trusted" -> true
               )
             ),

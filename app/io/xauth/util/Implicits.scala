@@ -2,11 +2,11 @@ package io.xauth.util
 
 import java.io.{File, FileInputStream}
 import java.security.{MessageDigest, SecureRandom}
+import java.text.SimpleDateFormat
 import java.util.Base64.getEncoder
-
+import java.util.Date
 import javax.crypto.spec.SecretKeySpec
 import javax.crypto.{KeyGenerator, SecretKey}
-
 import scala.io.Source
 import scala.util.Random
 
@@ -96,6 +96,12 @@ object Implicits {
     }
 
     def toSecretKey: SecretKey = new SecretKeySpec(bytes, 0, bytes.length, "RSA")
+  }
+
+  implicit class FormattedDate(date: Date) {
+    import io.xauth.service.mongo.BsonHandlers.iso8601DateFormat
+    private val formatter = new SimpleDateFormat(iso8601DateFormat)
+    val toIso8601: String = formatter.format(date)
   }
 
 }

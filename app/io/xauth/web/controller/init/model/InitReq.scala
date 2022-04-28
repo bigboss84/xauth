@@ -1,23 +1,13 @@
 package io.xauth.web.controller.init.model
 
+import play.api.libs.json.{Json, OWrites, Reads}
+
 /**
   * Application initialization request.
   */
-case class InitReq(client: Client, admin: Admin)
+case class InitReq(init: Init, configuration: Configuration)
 
 object InitReq {
-
-  import play.api.libs.functional.syntax._
-  import play.api.libs.json.Reads._
-  import play.api.libs.json._
-
-  implicit val reads: Reads[InitReq] = (
-    (__ \ "client").read[Client]
-      and (__ \ "admin").read[Admin]
-    ) (InitReq.apply _)
-
-  implicit val write: Writes[InitReq] = (
-    (__ \ "client").write[Client]
-      and (__ \ "admin").write[Admin]
-    ) (unlift(InitReq.unapply))
+  implicit val reads: Reads[InitReq] = Json.reads[InitReq]
+  implicit val writes: OWrites[InitReq] = Json.writes[InitReq]
 }

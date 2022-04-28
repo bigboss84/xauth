@@ -90,6 +90,15 @@ class JsonSchemaLoader @Inject()(implicit val conf: ApplicationConfiguration, im
   val AdminUserStatusPatchRes: JsonSchema =
     new JsonSchema("public/schema/v1/admin/users/status.patch.res.json")
 
+  val AdminUserApplicationsPatch: JsonSchema =
+    new JsonSchema("public/schema/v1/admin/users/applications.patch.req.json")
+
+  val AdminUserApplicationsPatchRes: JsonSchema =
+    new JsonSchema("public/schema/v1/admin/users/applications.patch.res.json")
+
+  val AdminUserSearch: JsonSchema =
+    new JsonSchema("public/schema/v1/admin/users/search.post.req.json")
+
   val AdminAccountTrustPostReq: JsonSchema =
     new JsonSchema("public/schema/v1/admin/account-trust.post.req.json")
 
@@ -226,6 +235,8 @@ class JsonSchemaLoader @Inject()(implicit val conf: ApplicationConfiguration, im
     AdminUsersPost,
     AdminUserRolesPatch, AdminUserRolesPatchRes,
     AdminUserStatusPatch, AdminUserStatusPatchRes,
+    AdminUserApplicationsPatch, AdminUserApplicationsPatchRes,
+    AdminUserSearch,
     AdminAccountTrustPostReq,
 
     // admin: client

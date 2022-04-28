@@ -100,7 +100,7 @@ class WorkspaceService @Inject()
     *
     * @return Returns a [[Future]] that boxes just created workspace.
     */
-  def createSystemWorkspace: Future[Workspace] = {
+  def createSystemWorkspace(applications: List[String]): Future[Workspace] = {
     val now = LocalDateTime.now()
     val nowInstant = now.toInstant(UTC)
     val date = Date.from(nowInstant)
@@ -120,6 +120,7 @@ class WorkspaceService @Inject()
           ),
           encryption = Encryption(configuration.jwtAlgorithm)
         ),
+        applications = applications,
         zoneId = ZoneId.systemDefault()
       ),
       registeredAt = date,
@@ -288,10 +289,6 @@ class WorkspaceService @Inject()
 
         // closing and purging workspace mongodb connection
         mongo.purgeConnection(w.id)
-
-        val now = LocalDateTime.now()
-        val nowInstant = now.toInstant(UTC)
-        val date = Date.from(nowInstant)
 
         // updating tenant removing current workspace id
         for {

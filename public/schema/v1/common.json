@@ -134,7 +134,7 @@
     "ApplicationName": {
       "description": "Defines the application name",
       "type": "string",
-      "patternBak": "^(?!_)([A-Z]+|(_(?!_)))+(?<!_)$"
+      "pattern": "^(?![_-])([a-z\\d]+|([_-](?![_-])))+(?<![_-])$"
     },
     "ApplicationPermission": {
       "description": "Defines the application permissions",
@@ -142,7 +142,8 @@
       "enum": [
         "OWNER",
         "READ",
-        "WRITE"
+        "WRITE",
+        "EXECUTION"
       ]
     },
     "NameSlug": {

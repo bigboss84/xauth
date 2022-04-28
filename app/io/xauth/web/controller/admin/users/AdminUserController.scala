@@ -7,7 +7,7 @@ import io.xauth.service.auth.model.AuthStatus.{Blocked, Disabled, Enabled}
 import io.xauth.service.workspace.model.Workspace
 import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.admin.users.model.UserRes._
-import io.xauth.web.controller.admin.users.model.{AccountTrustReq, UserReq, UserRoles, UserStatus}
+import io.xauth.web.controller.admin.users.model._
 import io.xauth.{JsonSchemaLoader, Uuid}
 import play.api.libs.json.Json.{obj, toJson}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -70,6 +70,20 @@ class AdminUserController @Inject()
           }
         }
 
+      // json schema validation has been failed
+      case e: JsError => successful(BadRequest(JsError.toJson(e)))
+    }
+  }
+
+  def search: Action[JsValue] = adminAction.async(parse.json) { r =>
+    // json schema validation
+    jsonSchema.AdminUserSearch.validateObj[UserSearchReq](r.body) match {
+      case s: JsSuccess[UserSearchReq] =>
+        implicit val workspace: Workspace = r.workspace
+        authUserService.findByUsername(s.value.username).map {
+          case Some(u) => Ok(Json.toJson(u.toResource))
+          case _ => NotFound
+        }
       // json schema validation has been failed
       case e: JsError => successful(BadRequest(JsError.toJson(e)))
     }
@@ -153,6 +167,30 @@ class AdminUserController @Inject()
         // json schema validation has been failed
         case JsError(e) => successful(BadRequest(JsError.toJson(e)))
       }
+  }
+
+  def patchApplications(id: Uuid): Action[JsValue] = adminAction.async(parse.json) { r =>
+    // validating by json schema
+    jsonSchema.AdminUserApplicationsPatch.validateObj[UserApplications](r.body) match {
+      // json schema validation has been succeeded
+      case s: JsSuccess[UserApplications] =>
+        implicit val workspace: Workspace = r.workspace
+
+        val workspaceApps = workspace.configuration.applications
+
+        // verifying with workspace applications
+        if (s.value.applications.forall(a => workspaceApps.contains(a.name))) {
+          // saving new user status
+          authUserService.updateApplications(id, s.value.applications: _*) map {
+            case Some(uu) => Ok(toJson(UserApplications(uu.applications)))
+            case _ => NotFound
+          }
+        }
+        else successful(BadRequest(Json.obj("message" -> s"allowed applications are: ${workspaceApps.mkString("[", ", ", "]")}")))
+
+      // json schema validation has been failed
+      case JsError(e) => successful(BadRequest(JsError.toJson(e)))
+    }
   }
 
   def accountTrust: Action[JsValue] = adminAction.async(parse.json) { request =>

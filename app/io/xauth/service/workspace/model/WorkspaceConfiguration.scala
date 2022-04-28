@@ -52,19 +52,21 @@ object Jwt extends DataFormat {
   implicit val bsonDocumentHandler: BSONDocumentHandler[Jwt] = Macros.handler[Jwt]
 }
 
-case class WorkspaceConfiguration(dbUri: String, jwt: Jwt, zoneId: ZoneId)
+case class WorkspaceConfiguration(dbUri: String, jwt: Jwt, applications: List[String], zoneId: ZoneId)
 
 object WorkspaceConfiguration extends DataFormat {
 
   implicit val reads: Reads[WorkspaceConfiguration] = (
     (__ \ "dbUri").read[String]
       and (__ \ "jwt").read[Jwt]
+      and (__ \ "applications").read[List[String]]
       and (__ \ "zoneId").read(ZoneIdReads)
     ) (WorkspaceConfiguration.apply _)
 
   implicit val write: Writes[WorkspaceConfiguration] = (
     (__ \ "dbUri").write[String]
       and (__ \ "jwt").write[Jwt]
+      and (__ \ "applications").write[List[String]]
       and (__ \ "zoneId").write(ZoneIdWrites)
     ) (unlift(WorkspaceConfiguration.unapply))
 

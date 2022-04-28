@@ -2,7 +2,6 @@ package io.xauth.web.controller.invitations
 
 import io.xauth.model.ContactType.Email
 import io.xauth.model.Permission
-import io.xauth.service.applications.ApplicationService
 import io.xauth.service.auth.model.AuthRole.{HelpDeskOperator, HumanResource, Responsible}
 import io.xauth.service.auth.model.{AuthCode, AuthCodeType}
 import io.xauth.service.auth.{AuthCodeService, AuthUserService}
@@ -37,7 +36,6 @@ class InvitationController @Inject()
   authService: AuthUserService,
   authCodeService: AuthCodeService,
   invitationService: InvitationService,
-  applicationService: ApplicationService,
   jsonSchema: JsonSchemaLoader
 )
 (implicit ec: ExecutionContext) extends AbstractController(cc) {
@@ -58,66 +56,61 @@ class InvitationController @Inject()
         val inv = s.value
 
         val appNames = inv.applications.map(_.name)
+        val workspaceApps = request.workspace.configuration.applications
 
-        // verifying existence of system application
-        applicationService.findAll flatMap { systemApps =>
+        // all supplied applications are recognized
+        if ((appNames diff workspaceApps) isEmpty) {
+          val ownApps = request.authUser.applications.filter(_.permissions.contains(Permission.Owner)).map(_.name)
+          val apps = inv.applications.map(_.name) diff ownApps
 
-          // all supplied applications are recognized
-          if ((appNames diff systemApps) isEmpty) {
-            val ownApps = request.authUser.applications.filter(_.permissions.contains(Permission.Owner)).map(_.name)
-            val apps = inv.applications.map(_.name) diff ownApps
-
-            if (ownApps.forall(systemApps.contains)) {
-
-              // verifying that all application are allowed
-              if (!request.authUser.roles.contains(HelpDeskOperator) && apps.nonEmpty) {
-                if (ownApps.nonEmpty) successful(BadRequest(obj("message" -> s"allowed applications are: ${ownApps.mkString(",")}")))
-                else successful(BadRequest(obj("message" -> "unable to assign applications")))
-              }
-
-              // logic validation
-              else inv.userInfo.contacts.find(_.`type` == Email).map(_.value) match {
-                case Some(email) =>
-
-                  implicit val workspace: Workspace = request.workspace
-
-                  // checking for existing user by email
-                  authService.findByUsername(email).map {
-                    case Some(_) => successful(
-                      BadRequest(obj("message" -> s"an existing user already corresponds to email '$email'"))
-                    )
-                    case _ =>
-                      invitationService.findByEmail(email).map {
-                        case Some(_) => successful(BadRequest(obj("message" -> s"an existing invitation already corresponds to email '$email'")))
-                        case _ =>
-
-                          val newInv = Invitation(
-                            description = inv.description,
-                            applications = inv.applications,
-                            userInfo = inv.userInfo,
-                            validFrom = inv.validFrom,
-                            validTo = inv.validTo,
-                          )
-
-                          // creating new invitation
-                          invitationService.create(newInv) transformWith {
-                            case Success(i) => successful(Created(Json.toJson(i.toResource)))
-                            case Failure(_) => successful(BadRequest(obj("message" -> s"No user found for email '$email'")))
-                          }
-                      }.flatten
-                  }.flatten
-
-                case _ => successful(
-                  BadRequest(obj("message" -> "at least one contact of type 'EMAIL' is required"))
-                )
-              }
-
+          if (ownApps.forall(workspaceApps.contains)) {
+            // verifying that all application are allowed
+            if (!request.authUser.roles.contains(HelpDeskOperator) && apps.nonEmpty) {
+              if (ownApps.nonEmpty) successful(BadRequest(obj("message" -> s"allowed applications are: ${ownApps.mkString(",")}")))
+              else successful(BadRequest(obj("message" -> "unable to assign applications")))
             }
-            else successful(BadRequest(obj("message" -> s"allowed applications are: ${appNames.mkString(",")}")))
-          }
 
-          else successful(BadRequest(obj("message" -> s"allowed applications are: ${appNames.mkString(",")}")))
+            // logic validation
+            else inv.userInfo.contacts.find(_.`type` == Email).map(_.value) match {
+              case Some(email) =>
+
+                implicit val workspace: Workspace = request.workspace
+
+                // checking for existing user by email
+                authService.findByUsername(email).map {
+                  case Some(_) => successful(
+                    BadRequest(obj("message" -> s"an existing user already corresponds to email '$email'"))
+                  )
+                  case _ =>
+                    invitationService.findByEmail(email).map {
+                      case Some(_) => successful(BadRequest(obj("message" -> s"an existing invitation already corresponds to email '$email'")))
+                      case _ =>
+
+                        val newInv = Invitation(
+                          description = inv.description,
+                          applications = inv.applications,
+                          userInfo = inv.userInfo,
+                          validFrom = inv.validFrom,
+                          validTo = inv.validTo,
+                        )
+
+                        // creating new invitation
+                        invitationService.create(newInv) transformWith {
+                          case Success(i) => successful(Created(Json.toJson(i.toResource)))
+                          case Failure(_) => successful(BadRequest(obj("message" -> s"No user found for email '$email'")))
+                        }
+                    }.flatten
+                }.flatten
+
+              case _ => successful(
+                BadRequest(obj("message" -> "at least one contact of type 'EMAIL' is required"))
+              )
+            }
+
+          }
+          else successful(BadRequest(obj("message" -> s"allowed applications are: ${workspaceApps.mkString(",")}")))
         }
+        else successful(BadRequest(obj("message" -> s"allowed applications are: ${workspaceApps.mkString(",")}")))
 
       // json schema validation has been failed
       case JsError(e) => successful(BadRequest(JsError.toJson(e)))

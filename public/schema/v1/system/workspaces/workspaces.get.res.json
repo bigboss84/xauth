@@ -97,6 +97,14 @@
                 ],
                 "additionalProperties": false
               },
+              "applications": {
+                "type": "array",
+                "items": {
+                  "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ApplicationName",
+                  "description": "Name in slug format"
+                },
+                "uniqueItems": true
+              },
               "zoneId": {
                 "$ref": "{baseUrl}/public/schema/v1/timezone.json#/definitions/ZoneId",
                 "description": "Zone identifier"
@@ -105,6 +113,7 @@
             "required": [
               "dbUri",
               "jwt",
+              "applications",
               "zoneId"
             ],
             "additionalProperties": false

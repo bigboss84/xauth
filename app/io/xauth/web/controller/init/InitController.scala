@@ -50,7 +50,7 @@ class InitController @Inject()
 
         // json schema validation has been succeeded
         case s: JsSuccess[InitReq] =>
-          val init = s.value
+          val o = s.value
 
           appSettingService.find(Init) flatMap {
 
@@ -58,8 +58,8 @@ class InitController @Inject()
               successful(BadRequest(Json.obj("message" -> "application already configured")))
 
             case _ =>
-              val email = init.admin.username
-              val pass = init.admin.password
+              val email = o.init.admin.username
+              val pass = o.init.admin.password
 
               val userInfo = UserInfo(
                 firstName = "unknown", // todo: read from app conf
@@ -72,9 +72,9 @@ class InitController @Inject()
                 // creating root tenant
                 _ <- tenantService.createSystemTenant
                 // creating root workspace
-                w <- workspaceService.createSystemWorkspace
+                w <- workspaceService.createSystemWorkspace(o.configuration.applications)
                 // configuring client
-                _ <- authClientService.create(init.client.id, init.client.secret)(w)
+                _ <- authClientService.create(o.init.client.id, o.init.client.secret)(w)
                 // configuring system admin user
                 _ <- authUserService.save(email, pass, Some("system administrator"), userInfo, Enabled, Nil, User, Admin, System)(w)
                 // saving new application state

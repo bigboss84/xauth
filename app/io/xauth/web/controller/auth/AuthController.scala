@@ -90,9 +90,12 @@ class AuthController @Inject()
                   // todo: store token date
                   // creating new bearer token
 
+                  // computing all application currently configured in workspace
+                  val apps = authUser.applications.filter(a => workspace.configuration.applications.contains(a.name))
+
                   val tokenRes = TokenRes(
                     JwtService.TokenType,
-                    jwtService.createToken(authUser.id, workspace.id, authUser.roles, authUser.applications),
+                    jwtService.createToken(authUser.id, workspace.id, authUser.roles, apps),
                     JwtService.accessTokenExpiration,
                     JwtService.createRefreshToken
                   )
@@ -171,10 +174,12 @@ class AuthController @Inject()
                     case Some(authUser) =>
                       // verifying if user is currently enabled
                       if (authUser.status == Enabled) {
+                        // computing all application currently configured in workspace
+                        val apps = authUser.applications.filter(a => workspace.configuration.applications.contains(a.name))
                         // generating new access token
                         Ok(Json.toJson(TokenRes(
                           JwtService.TokenType,
-                          jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, authUser.applications),
+                          jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, apps),
                           JwtService.refreshTokenExpiration,
                           authRefreshToken.token
                         )))

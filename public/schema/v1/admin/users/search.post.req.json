@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "POST /v1/admin/users/search",
+  "type": "object",
+  "properties": {
+    "username": {
+      "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/Username",
+      "description": "Username to search"
+    }
+  },
+  "required": [
+    "username"
+  ],
+  "additionalProperties": false
+}

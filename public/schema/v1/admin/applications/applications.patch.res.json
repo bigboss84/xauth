@@ -7,7 +7,7 @@
       "type": "array",
       "items": {
         "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ApplicationName",
-        "description": "System patched applications"
+        "description": "Workspace patched applications"
       },
       "uniqueItems": true
     }

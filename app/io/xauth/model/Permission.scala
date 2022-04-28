@@ -16,6 +16,7 @@ object Permission extends Enum {
   val Owner: Permission = value("OWNER")
   val Read: Permission = value("READ")
   val Write: Permission = value("WRITE")
+  val Execution: Permission = value("EXECUTION")
 
   // Json serialization
   implicit val reads: Reads[Permission] = enumNameReads(Permission)
