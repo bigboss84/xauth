@@ -1,14 +1,12 @@
 package io.xauth.config
 
 import io.xauth.config.InvitationCodeNotification.{Auto, InvitationCodeNotification, Manual}
-import play.api.{Configuration, Logger}
+import play.api.Configuration
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ApplicationConfiguration @Inject()(conf: Configuration) {
-
-  private val logger: Logger = Logger(this.getClass)
 
   val baseUrl: String = conf.get[String]("baseUrl")
 
@@ -17,37 +15,23 @@ class ApplicationConfiguration @Inject()(conf: Configuration) {
   val taskTokenCleanInterval: Int = conf.get[Int]("task.tokenClean.interval")
 
   // Json Web Token
-  val jwtSecretKeyPath: String = conf.get[String]("jwt.secretKey.path")
-  val jwtExpirationAccessToken: Int = conf.get[Int]("jwt.expiration.accessToken")
-
-  val jwtAlgorithm: String = conf.get[String]("jwt.secretKey.algorithm")
-
-  val jwtExpirationRefreshToken: Int = conf.get[Int]("jwt.expiration.refreshToken")
+  val jwtExpirationAccessToken: Int = conf.get[Int]("workspace.jwt.expiration.accessToken")
+  val jwtExpirationRefreshToken: Int = conf.get[Int]("workspace.jwt.expiration.refreshToken")
+  val jwtSecretKeyPath: String = conf.get[String]("workspace.jwt.secretKey.path")
+  val jwtAlgorithm: String = conf.get[String]("workspace.jwt.secretKey.algorithm")
 
   val mongoDbUri: String = conf.get[String]("mongodb.uri")
 
-  import MailServiceType.MailServiceType
-
-  val mailDebug: Boolean = conf.get[Boolean]("mail.debug")
-
-  val mailServiceType: MailServiceType = conf.get[String]("mail.service") match {
-    case "smtp" => MailServiceType.Smtp
-    case _ => MailServiceType.WebService
-  }
-
-  val mailService: MailService = MailService(
-    conf.get[String]("mail.ws.schema"),
-    conf.get[String]("mail.ws.host"),
-    conf.get[String]("mail.ws.user"),
-    conf.get[String]("mail.ws.pass")
-  )
-
+  // Mail
+  val mailName: String = conf.get[String]("workspace.mail.name")
+  val mailFrom: String = conf.get[String]("workspace.mail.from")
   val mailSmtp: MailSmtp = MailSmtp(
-    conf.get[String]("mail.smtp.host"),
-    conf.get[Int]("mail.smtp.port"),
-    conf.get[String]("mail.smtp.user"),
-    conf.get[String]("mail.smtp.pass"),
-    conf.get[String]("mail.smtp.channel")
+    conf.get[String]("workspace.mail.smtp.host"),
+    conf.get[Int]("workspace.mail.smtp.port"),
+    conf.get[String]("workspace.mail.smtp.user"),
+    conf.get[String]("workspace.mail.smtp.pass"),
+    conf.get[String]("workspace.mail.smtp.channel"),
+    conf.get[Boolean]("workspace.mail.smtp.debug")
   )
 
   val maxLoginAttempts: Int = conf.get[Int]("auth.maxLoginAttempts")
@@ -73,16 +57,7 @@ case class AsymmetricKey
   publicKeyBytes: Array[Byte]
 )
 
-object MailServiceType extends Enumeration {
-  type MailServiceType = Value
-
-  val WebService: MailServiceType = Value
-  val Smtp: MailServiceType = Value
-}
-
-case class MailService(schema: String, host: String, user: String, pass: String)
-
-case class MailSmtp(host: String, port: Int, user: String, pass: String, channel: String)
+case class MailSmtp(host: String, port: Int, user: String, pass: String, channel: String, debug: Boolean)
 
 object InvitationCodeNotification extends Enumeration {
   type InvitationCodeNotification = Value

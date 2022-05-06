@@ -21,6 +21,7 @@ GET         /v1/system/workspaces/:id            io.xauth.web.controller.system.
 PUT         /v1/system/workspaces/:id            io.xauth.web.controller.system.workspaces.SystemWorkspaceController.update(id: io.xauth.Uuid)
 DELETE      /v1/system/workspaces/:id            io.xauth.web.controller.system.workspaces.SystemWorkspaceController.delete(id: io.xauth.Uuid)
 PATCH       /v1/system/workspaces/:id/status     io.xauth.web.controller.system.workspaces.SystemWorkspaceController.patchStatus(id: io.xauth.Uuid)
+POST        /v1/system/workspaces/messaging-test io.xauth.web.controller.system.workspaces.SystemWorkspaceController.messagingTest
 
 # Admin: Users, Clients and Application
 POST        /v1/admin/users                      io.xauth.web.controller.admin.users.AdminUserController.create

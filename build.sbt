@@ -58,7 +58,10 @@ libraryDependencies ++= Seq(
   "com.sandinh" %% "play-soap" % "1.8.0",
 
   // xenum-scala
-  "it.russoft.xenum" %% "xenum-scala" % "1.3.1"
+  "it.russoft.xenum" %% "xenum-scala" % "1.3.1",
+
+  // Cats
+  "org.typelevel" %% "cats-core" % "2.7.0"
 )
 
 // disabling documentation generation and publish

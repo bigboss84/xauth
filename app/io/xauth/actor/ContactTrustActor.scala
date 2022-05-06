@@ -4,7 +4,7 @@ import akka.actor.Actor
 import io.xauth.config.{ConfigurationLoader, EmailConfiguration}
 import io.xauth.model.ContactType.Email
 import io.xauth.model.UserContact
-import io.xauth.service.MessagingClient
+import io.xauth.service.Messaging
 import io.xauth.service.auth.AuthCodeService
 import io.xauth.service.auth.model.AuthCodeType.ContactTrust
 import io.xauth.service.auth.model.AuthUser
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 class ContactTrustActor @Inject()
 (
   authCodeService: AuthCodeService,
-  messagingClient: MessagingClient,
+  messaging: Messaging,
   confLoader: ConfigurationLoader
 )
 (implicit ec: ExecutionContext) extends Actor {
@@ -45,8 +45,8 @@ class ContactTrustActor @Inject()
               case Success(authCode) =>
                 logger.info(s"sending trust code to ${contact.value}")
 
-                messagingClient.sendMail(
-                  conf.name, conf.from, contact.value, conf.subject,
+                messaging.mailer.send(
+                  contact.value, conf.subject,
                   conf.message.map { s =>
                     s
                       .replace("{firstName}", u.userInfo.firstName)

@@ -16,76 +16,8 @@
       "description": "Brief description"
     },
     "configuration": {
-      "type": "object",
-      "properties": {
-        "dbUri": {
-          "type": "string",
-          "description": "URI of the persistence system"
-        },
-        "jwt": {
-          "type": "object",
-          "properties": {
-            "expiration": {
-              "type": "object",
-              "properties": {
-                "accessToken": {
-                  "type": "integer",
-                  "description": "Access token expiration (in seconds)",
-                  "default": 1800
-                },
-                "refreshToken": {
-                  "type": "integer",
-                  "description": "Refresh token expiration (in hours)",
-                  "default": 12
-                }
-              },
-              "required": [
-                "accessToken",
-                "refreshToken"
-              ],
-              "additionalProperties": false
-            },
-            "encryption": {
-              "type": "object",
-              "description": "Token encryption settings",
-              "properties": {
-                "algorithm": {
-                  "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/TokenAlgorithm",
-                  "description": "Asymmetric/Symmetric algorithm type"
-                }
-              },
-              "required": [
-                "algorithm"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "required": [
-            "expiration",
-            "encryption"
-          ],
-          "additionalProperties": false
-        },
-        "applications": {
-          "type": "array",
-          "items": {
-            "$ref": "{baseUrl}/public/schema/v1/common.json#/definitions/ApplicationName",
-            "description": "Name in slug format"
-          },
-          "uniqueItems": true
-        },
-        "zoneId": {
-          "$ref": "{baseUrl}/public/schema/v1/timezone.json#/definitions/ZoneId",
-          "description": "Zone identifier"
-        }
-      },
-      "required": [
-        "dbUri",
-        "jwt",
-        "applications",
-        "zoneId"
-      ],
-      "additionalProperties": false
+      "$ref": "{baseUrl}/public/schema/v1/system/workspaces/common.json#/definitions/WorkspaceConfiguration",
+      "description": "The specific workspace configuration"
     },
     "init": {
       "type": "object",

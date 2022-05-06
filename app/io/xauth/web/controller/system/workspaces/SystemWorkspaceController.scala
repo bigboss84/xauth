@@ -1,15 +1,17 @@
 package io.xauth.web.controller.system.workspaces
 
+import io.xauth.service.Messaging
 import io.xauth.service.auth.model.AuthRole.System
 import io.xauth.service.mongo.MongoDbClient
 import io.xauth.service.tenant.TenantService
 import io.xauth.service.workspace.WorkspaceService
+import io.xauth.service.workspace.model.Workspace
 import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.system.workspaces.model.WorkspaceRes.WorkspaceResourceConverter
 import io.xauth.web.controller.system.workspaces.model.{WorkspacePutReq, WorkspaceReq, WorkspaceStatusPatch}
 import io.xauth.{JsonSchemaLoader, Uuid}
 import play.api.libs.json.Json.{obj, toJson}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsDefined, JsError, JsSuccess, JsUndefined, JsValue, Json}
 import play.api.mvc._
 
 import javax.inject.{Inject, Singleton}
@@ -26,6 +28,7 @@ class SystemWorkspaceController @Inject()
   jsonSchema: JsonSchemaLoader,
   tenantService: TenantService,
   workspaceService: WorkspaceService,
+  messaging: Messaging,
   mongoDbClient: MongoDbClient,
   cc: ControllerComponents
 )
@@ -139,6 +142,16 @@ class SystemWorkspaceController @Inject()
 
       // json schema validation has been failed
       case JsError(e) => successful(BadRequest(JsError.toJson(e)))
+    }
+  }
+
+  def messagingTest: Action[JsValue] = systemAction.async(parse.json) { r =>
+    r.body \ "email" match {
+      case JsDefined(email) =>
+        implicit val w: Workspace = r.workspace
+        messaging.mailer.send(email.as[String], "messaging-test", s"Messaging test for workspace: ${w.slug}")
+        successful(Accepted)
+      case _ => successful(BadRequest)
     }
   }
 

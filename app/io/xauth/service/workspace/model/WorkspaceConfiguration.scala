@@ -52,12 +52,29 @@ object Jwt extends DataFormat {
   implicit val bsonDocumentHandler: BSONDocumentHandler[Jwt] = Macros.handler[Jwt]
 }
 
-case class WorkspaceConfiguration(dbUri: String, jwt: Jwt, applications: List[String], zoneId: ZoneId)
+case class SmtpConfiguration(host: String, port: Int, user: String, pass: String, channel: String, debug: Boolean)
+
+object SmtpConfiguration {
+  implicit val reads: Reads[SmtpConfiguration] = Json.reads[SmtpConfiguration]
+  implicit val writes: OWrites[SmtpConfiguration] = Json.writes[SmtpConfiguration]
+  implicit val bsonDocumentHandler: BSONDocumentHandler[SmtpConfiguration] = Macros.handler[SmtpConfiguration]
+}
+
+case class MailConfiguration(from: String, name: String, smtp: SmtpConfiguration)
+
+object MailConfiguration {
+  implicit val reads: Reads[MailConfiguration] = Json.reads[MailConfiguration]
+  implicit val writes: OWrites[MailConfiguration] = Json.writes[MailConfiguration]
+  implicit val bsonDocumentHandler: BSONDocumentHandler[MailConfiguration] = Macros.handler[MailConfiguration]
+}
+
+case class WorkspaceConfiguration(dbUri: String, mail: MailConfiguration, jwt: Jwt, applications: List[String], zoneId: ZoneId)
 
 object WorkspaceConfiguration extends DataFormat {
 
   implicit val reads: Reads[WorkspaceConfiguration] = (
     (__ \ "dbUri").read[String]
+      and (__ \ "mail").read[MailConfiguration]
       and (__ \ "jwt").read[Jwt]
       and (__ \ "applications").read[List[String]]
       and (__ \ "zoneId").read(ZoneIdReads)
@@ -65,6 +82,7 @@ object WorkspaceConfiguration extends DataFormat {
 
   implicit val write: Writes[WorkspaceConfiguration] = (
     (__ \ "dbUri").write[String]
+      and (__ \ "mail").write[MailConfiguration]
       and (__ \ "jwt").write[Jwt]
       and (__ \ "applications").write[List[String]]
       and (__ \ "zoneId").write(ZoneIdWrites)

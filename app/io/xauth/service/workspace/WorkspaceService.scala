@@ -113,6 +113,18 @@ class WorkspaceService @Inject()
       status = Enabled,
       configuration = WorkspaceConfiguration(
         dbUri = configuration.mongoDbUri,
+        mail = MailConfiguration(
+          name = configuration.mailName,
+          from = configuration.mailFrom,
+          smtp = SmtpConfiguration(
+            host = configuration.mailSmtp.host,
+            port = configuration.mailSmtp.port,
+            user = configuration.mailSmtp.user,
+            pass = configuration.mailSmtp.pass,
+            channel = configuration.mailSmtp.channel,
+            debug = configuration.mailSmtp.debug
+          )
+        ),
         jwt = Jwt(
           expiration = Expiration(
             accessToken = configuration.jwtExpirationAccessToken,

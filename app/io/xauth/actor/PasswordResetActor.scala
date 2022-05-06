@@ -3,7 +3,7 @@ package io.xauth.actor
 import akka.actor.{Actor, Props}
 import io.xauth.config.{ConfigurationLoader, EmailConfiguration}
 import io.xauth.model.ContactType.Email
-import io.xauth.service.MessagingClient
+import io.xauth.service.Messaging
 import io.xauth.service.auth.AuthCodeService
 import io.xauth.service.auth.model.AuthCodeType.PasswordReset
 import io.xauth.service.auth.model.AuthUser
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 class PasswordResetActor @Inject()
 (
   authCodeService: AuthCodeService,
-  messagingClient: MessagingClient,
+  messaging: Messaging,
   confLoader: ConfigurationLoader
 )
 (implicit ec: ExecutionContext) extends Actor {
@@ -42,8 +42,8 @@ class PasswordResetActor @Inject()
             case Success(authCode) =>
               logger.info(s"sending password reset email to ${contact.value}")
 
-              messagingClient.sendMail(
-                conf.name, conf.from, contact.value, conf.subject,
+              messaging.mailer.send(
+                contact.value, conf.subject,
                 conf.message.map { s =>
                   s
                     .replace("{firstName}", u.userInfo.firstName)
