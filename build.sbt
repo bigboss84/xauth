@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 name := "x-auth"
 organization := "io.xauth"
 organizationName := "X-Auth"
@@ -10,7 +12,7 @@ lazy val root = (project in file("."))
 scalaVersion := "2.12.6"
 
 scalacOptions ++= Seq(
-"-feature", "-language:postfixOps"
+  "-feature", "-language:postfixOps"
 )
 
 // Json-Schema validator todo: unmanaged dependency
@@ -70,6 +72,17 @@ libraryDependencies ++= Seq(
 
 // setting integration test source directory
 //scalaSource in Test := baseDirectory.value / "test-integration"
+
+Compile / sourceGenerators += Def.task {
+  import java.util.Date
+  val file = (Compile / sourceManaged).value / "/io/xauth/generated/ApplicationInfo.scala"
+  val contents = IO.read(new File(s"${baseDirectory.value}/application-info.scala.template"))
+    .replace("{{NAME}}", name.value)
+    .replace("{{VERSION}}", version.value)
+    .replace("{{BUILT_AT}}", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'").format(new Date))
+  IO.write(file, contents)
+  Seq(file)
+}.taskValue
 
 lazy val dockerComposeUp = taskKey[Unit]("starting docker services")
 lazy val dockerComposeDown = taskKey[Unit]("stopping docker services")

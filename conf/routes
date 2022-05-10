@@ -1,11 +1,14 @@
 # Application home page
 GET         /                                    io.xauth.web.controller.HomeController.index
 
-# Init
-POST        /v1/init/configuration               io.xauth.web.controller.init.InitController.configuration
+# Version
+GET         /v1/info                             io.xauth.web.controller.ApplicationInfoController.info
 
 # Health
 GET         /v1/health                           io.xauth.web.controller.health.HealthController.health
+
+# Init
+POST        /v1/init/configuration               io.xauth.web.controller.init.InitController.configuration
 
 # System: Tenants
 POST        /v1/system/tenants                   io.xauth.web.controller.system.tenants.SystemTenantController.create

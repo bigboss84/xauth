@@ -4,6 +4,7 @@
 body { color: #444; font-family: "ShareTech-Regular"; background-color: #efefef; }
 
 #logo { height: 100px; }
+.version { margin: 0 auto; text-align: right; width: 245px; position: relative; top: -4px; }
 
 h1 { font-family: "ShareTech-Regular"; text-align: center; }
 

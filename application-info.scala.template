@@ -1,0 +1,7 @@
+package io.xauth.generated
+
+object ApplicationInfo {
+  val Name: String = "{{NAME}}"
+  val Version: String = "{{VERSION}}"
+  val BuiltAt: String = "{{BUILT_AT}}"
+}
