@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat
 name := "x-auth"
 organization := "io.xauth"
 organizationName := "X-Auth"
+maintainer := "Enrico Russo <enrico.russo.84@gmail.com>"
 
 version := "2.0.0"
 
@@ -34,8 +35,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "6.0.1",
 
   // MongoDb
-  "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0",
-  "org.reactivemongo" %% "play2-reactivemongo" % "1.1.0-play28-RC3",
+  "org.mongodb.scala" %% "mongo-scala-driver" % "4.7.1",
+  "org.reactivemongo" %% "play2-reactivemongo" % "1.1.0-play28-RC6",
 
   // Json-Schema validator todo: unmanaged dependency
   //"com.eclipsesource" %% "play-json-schema-validator" % "0.9.5",
@@ -129,7 +130,6 @@ install := {
       "-a" :: f"${name.value}" ::
       "-v" :: f"${version.value}" ::
       "-e" :: sys.props.getOrElse("environment", "development") ::
-      "-r" :: "989501292634.dkr.ecr.eu-west-1.amazonaws.com" ::
-      "-p" :: "'http://proxy-web.xauth.io'" :: Nil
+      "-r" :: "527126057281.dkr.ecr.eu-south-1.amazonaws.com" :: Nil
   ).!
 }
