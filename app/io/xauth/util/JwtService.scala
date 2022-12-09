@@ -143,7 +143,7 @@ object JwtService {
     * @return The expiration in minutes.
     */
   def accessTokenExpiration(implicit w: Workspace): Int =
-    (w.configuration.jwt.expiration.accessToken / 60).intValue
+    w.configuration.jwt.expiration.accessToken
 
   /**
     * Gets the refresh token expiration in minutes.
@@ -151,5 +151,5 @@ object JwtService {
     * @return The expiration in minutes.
     */
   def refreshTokenExpiration(implicit w: Workspace): Int =
-    (w.configuration.jwt.expiration.refreshToken / 60).intValue
+    w.configuration.jwt.expiration.refreshToken
 }
