@@ -22,6 +22,18 @@ class ApplicationConfiguration @Inject()(conf: Configuration) {
 
   val mongoDbUri: String = conf.get[String]("mongodb.uri")
 
+  // Front-End
+  val frontEnd: FrontEnd = FrontEnd(
+    conf.get[String]("workspace.frontEnd.baseUrl"),
+    Routes(
+      conf.get[String]("workspace.frontEnd.routes.activation"),
+      conf.get[String]("workspace.frontEnd.routes.deletion"),
+      conf.get[String]("workspace.frontEnd.routes.contactTrust"),
+      conf.get[String]("workspace.frontEnd.routes.passwordReset"),
+      conf.get[String]("workspace.frontEnd.routes.registrationInvitation"),
+    )
+  )
+
   // Mail
   val mailName: String = conf.get[String]("workspace.mail.name")
   val mailFrom: String = conf.get[String]("workspace.mail.from")
@@ -56,6 +68,9 @@ case class AsymmetricKey
   privateKeyBytes: Array[Byte],
   publicKeyBytes: Array[Byte]
 )
+
+case class Routes(activation: String, deletion: String, contactTrust: String, passwordReset: String, registrationInvitation: String)
+case class FrontEnd(baseUrl: String, routes: Routes)
 
 case class MailSmtp(host: String, port: Int, user: String, pass: String, channel: String, debug: Boolean)
 

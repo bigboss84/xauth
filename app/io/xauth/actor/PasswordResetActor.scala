@@ -42,12 +42,16 @@ class PasswordResetActor @Inject()
             case Success(authCode) =>
               logger.info(s"sending password reset email to ${contact.value}")
 
+              val link = workspace.configuration.frontEnd.baseUrl +
+                workspace.configuration.frontEnd.routes.passwordReset.replace("{code}", authCode.code)
+
               messaging.mailer.send(
                 contact.value, conf.subject,
                 conf.message.map { s =>
                   s
                     .replace("{firstName}", u.userInfo.firstName)
                     .replace("{code}", authCode.code)
+                    .replace("{link}", link)
                     .replace("{codeExpiration}", authCode.expiresAt.toString)
                 }.mkString("\n")
               )

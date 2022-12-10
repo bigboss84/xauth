@@ -37,6 +37,53 @@
           "type": "string",
           "description": "URI of the persistence system"
         },
+        "frontEnd": {
+          "type": "object",
+          "properties": {
+            "baseUrl": {
+              "type": "string",
+              "description": "Front-end base url"
+            },
+            "routes": {
+              "type": "object",
+              "properties": {
+                "activation": {
+                  "type": "string",
+                  "description": "Front-end route that handles account activation"
+                },
+                "deletion": {
+                  "type": "string",
+                  "description": "Front-end route that handles account deletion"
+                },
+                "contactTrust": {
+                  "type": "string",
+                  "description": "Front-end route that handles contact trust"
+                },
+                "passwordReset": {
+                  "type": "string",
+                  "description": "Front-end route that allows to change password"
+                },
+                "registrationInvitation": {
+                  "type": "string",
+                  "description": "Front-end route that handles registration invitation"
+                }
+              },
+              "required": [
+                "activation",
+                "deletion",
+                "contactTrust",
+                "passwordReset",
+                "registrationInvitation"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "baseUrl",
+            "routes"
+          ],
+          "additionalProperties": false
+        },
         "mail": {
           "type": "object",
           "properties": {
@@ -161,6 +208,7 @@
       },
       "required": [
         "dbUri",
+        "frontEnd",
         "mail",
         "jwt",
         "applications",

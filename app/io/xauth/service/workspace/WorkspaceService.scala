@@ -113,6 +113,16 @@ class WorkspaceService @Inject()
       status = Enabled,
       configuration = WorkspaceConfiguration(
         dbUri = configuration.mongoDbUri,
+        frontEnd = FrontEndConfiguration(
+          baseUrl = configuration.frontEnd.baseUrl,
+          routes = RoutesConfiguration(
+            activation = configuration.frontEnd.routes.activation,
+            deletion = configuration.frontEnd.routes.deletion,
+            contactTrust = configuration.frontEnd.routes.contactTrust,
+            passwordReset = configuration.frontEnd.routes.passwordReset,
+            registrationInvitation = configuration.frontEnd.routes.registrationInvitation
+          )
+        ),
         mail = MailConfiguration(
           name = configuration.mailName,
           from = configuration.mailFrom,

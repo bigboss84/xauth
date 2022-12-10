@@ -6,9 +6,10 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.Writes._
 import play.api.libs.json._
-import reactivemongo.api.bson.{BSONDocumentHandler, Macros}
+import reactivemongo.api.bson.{BSONDocument, BSONDocumentHandler, Macros}
 
 import java.time.ZoneId
+import scala.util.Try
 
 case class Expiration(accessToken: Int, refreshToken: Int)
 
@@ -52,6 +53,29 @@ object Jwt extends DataFormat {
   implicit val bsonDocumentHandler: BSONDocumentHandler[Jwt] = Macros.handler[Jwt]
 }
 
+case class RoutesConfiguration
+(
+  activation: String,
+  deletion: String,
+  contactTrust: String,
+  passwordReset: String,
+  registrationInvitation: String
+)
+
+object RoutesConfiguration {
+  implicit val reads: Reads[RoutesConfiguration] = Json.reads[RoutesConfiguration]
+  implicit val writes: OWrites[RoutesConfiguration] = Json.writes[RoutesConfiguration]
+  implicit val bsonDocumentHandler: BSONDocumentHandler[RoutesConfiguration] = Macros.handler[RoutesConfiguration]
+}
+
+case class FrontEndConfiguration(baseUrl: String, routes: RoutesConfiguration)
+
+object FrontEndConfiguration {
+  implicit val reads: Reads[FrontEndConfiguration] = Json.reads[FrontEndConfiguration]
+  implicit val writes: OWrites[FrontEndConfiguration] = Json.writes[FrontEndConfiguration]
+  implicit val bsonDocumentHandler: BSONDocumentHandler[FrontEndConfiguration] = Macros.handler[FrontEndConfiguration]
+}
+
 case class SmtpConfiguration(host: String, port: Int, user: String, pass: String, channel: String, debug: Boolean)
 
 object SmtpConfiguration {
@@ -68,12 +92,13 @@ object MailConfiguration {
   implicit val bsonDocumentHandler: BSONDocumentHandler[MailConfiguration] = Macros.handler[MailConfiguration]
 }
 
-case class WorkspaceConfiguration(dbUri: String, mail: MailConfiguration, jwt: Jwt, applications: List[String], zoneId: ZoneId)
+case class WorkspaceConfiguration(dbUri: String, frontEnd: FrontEndConfiguration, mail: MailConfiguration, jwt: Jwt, applications: List[String], zoneId: ZoneId)
 
 object WorkspaceConfiguration extends DataFormat {
 
   implicit val reads: Reads[WorkspaceConfiguration] = (
     (__ \ "dbUri").read[String]
+      and (__ \ "frontEnd").read[FrontEndConfiguration]
       and (__ \ "mail").read[MailConfiguration]
       and (__ \ "jwt").read[Jwt]
       and (__ \ "applications").read[List[String]]
@@ -82,6 +107,7 @@ object WorkspaceConfiguration extends DataFormat {
 
   implicit val write: Writes[WorkspaceConfiguration] = (
     (__ \ "dbUri").write[String]
+      and (__ \ "frontEnd").write[FrontEndConfiguration]
       and (__ \ "mail").write[MailConfiguration]
       and (__ \ "jwt").write[Jwt]
       and (__ \ "applications").write[List[String]]

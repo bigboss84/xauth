@@ -54,12 +54,16 @@ class RegistrationInvitationActor @Inject()
             case Success(authCode) =>
               logger.info(s"sending invitation email to ${contact.value}")
 
+              val link = workspace.configuration.frontEnd.baseUrl +
+                workspace.configuration.frontEnd.routes.registrationInvitation.replace("{code}", authCode.code)
+
               messaging.mailer.send(
                 contact.value, conf.subject,
                 conf.message.map { s =>
                   s
                     .replace("{firstName}", u.firstName)
                     .replace("{code}", authCode.code)
+                    .replace("{link}", link)
                     .replace("{codeExpiration}", authCode.expiresAt.toString)
                 }.mkString("\n")
               )
