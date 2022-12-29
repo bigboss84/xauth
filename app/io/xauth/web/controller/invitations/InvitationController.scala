@@ -23,7 +23,7 @@ import java.util.Date
 import javax.inject._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 /**
   * Controller that exposes registration invitations routes.
@@ -123,11 +123,11 @@ class InvitationController @Inject()
   def findAll: Action[AnyContent] = hrAction.async { request =>
     implicit val workspace: Workspace = request.workspace
 
-    request.queryString("q") match {
-      case s: Seq[String] if s.size == 1 && s.head.nonEmpty =>
-        invitationService.findByEmail(s.head) flatMap {
+    Try(request.queryString("q")) match {
+      case Success(v) if v.size == 1 && v.head.nonEmpty =>
+        invitationService.findByEmail(v.head) flatMap {
           case Some(i) => successful(Ok(toJson(i)))
-          case _ => authCodeService.find(s.head) flatMap {
+          case _ => authCodeService.find(v.head) flatMap {
             case Some(c) => invitationService.find(c.referenceId) map {
               case Some(i) => Ok(toJson(i.toResource))
               case _ => NotFound
@@ -135,7 +135,7 @@ class InvitationController @Inject()
             case _ => successful(NotFound(obj("message" -> "invitation code not found")))
           }
         }
-      case _ => successful(BadRequest(obj("message" -> "no valid invitation code in 'q' parameter")))
+      case Failure(_) => successful(BadRequest(obj("message" -> "no valid invitation code in 'q' parameter")))
     }
   }
 

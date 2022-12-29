@@ -11,14 +11,16 @@ import io.xauth.service.invitation.model.Invitation.generateCode
 import io.xauth.service.workspace.model.Workspace
 import play.api.Logger
 
+import java.nio.charset.StandardCharsets
 import java.time.Duration
+import java.util.Base64
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 /**
- * Registration Invitation Email dispatcher actor.
- */
+  * Registration Invitation Email dispatcher actor.
+  */
 class RegistrationInvitationActor @Inject()
 (
   authCodeService: AuthCodeService,
@@ -30,6 +32,8 @@ class RegistrationInvitationActor @Inject()
   private val logger: Logger = Logger(this.getClass)
 
   private lazy val conf: EmailConfiguration = confLoader.RegistrationInvitationConf
+
+  private def toBase64(s: String) = Base64.getEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8))
 
   import RegistrationInvitationActor._
 
@@ -55,7 +59,9 @@ class RegistrationInvitationActor @Inject()
               logger.info(s"sending invitation email to ${contact.value}")
 
               val link = workspace.configuration.frontEnd.baseUrl +
-                workspace.configuration.frontEnd.routes.registrationInvitation.replace("{code}", authCode.code)
+                workspace.configuration.frontEnd.routes.registrationInvitation
+                  .replace("{code}", authCode.code)
+                  .replace("{email}", toBase64(contact.value))
 
               messaging.mailer.send(
                 contact.value, conf.subject,
