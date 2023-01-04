@@ -67,7 +67,7 @@ class AuthRefreshTokenService @Inject()
 
     val now = LocalDateTime.now()
     val registeredAt = now.toInstant(UTC)
-    val expiresAt = now.plusHours(12).toInstant(UTC)
+    val expiresAt = now.plusSeconds(w.configuration.jwt.expiration.refreshToken).toInstant(UTC)
 
     val authRefreshToken = AuthRefreshToken(
       token = token,

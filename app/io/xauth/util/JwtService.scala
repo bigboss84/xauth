@@ -136,20 +136,4 @@ object JwtService {
     import Implicits.RandomString
     (('a' to 'f') ++ ('0' to '9')).random(40)
   }
-
-  /**
-    * Gets the access token expiration in minutes.
-    * @param w The current workspace.
-    * @return The expiration in minutes.
-    */
-  def accessTokenExpiration(implicit w: Workspace): Int =
-    w.configuration.jwt.expiration.accessToken
-
-  /**
-    * Gets the refresh token expiration in minutes.
-    * @param w The current workspace.
-    * @return The expiration in minutes.
-    */
-  def refreshTokenExpiration(implicit w: Workspace): Int =
-    w.configuration.jwt.expiration.refreshToken
 }
