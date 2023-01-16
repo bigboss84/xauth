@@ -1,11 +1,14 @@
 package io.xauth.web.controller.admin.users
 
 import io.xauth.model.ContactType.Email
+import io.xauth.model.pagination.{OffsetSpecs, PagedData, Pagination}
 import io.xauth.service.auth.AuthUserService
 import io.xauth.service.auth.model.AuthRole.{Admin, System}
 import io.xauth.service.auth.model.AuthStatus.{Blocked, Disabled, Enabled}
+import io.xauth.service.auth.model.AuthUser
 import io.xauth.service.workspace.model.Workspace
 import io.xauth.web.action.auth.AuthenticationManager
+import io.xauth.web.controller.admin.users.model.PagedUserRes._
 import io.xauth.web.controller.admin.users.model.UserRes._
 import io.xauth.web.controller.admin.users.model._
 import io.xauth.{JsonSchemaLoader, Uuid}
@@ -86,6 +89,19 @@ class AdminUserController @Inject()
         }
       // json schema validation has been failed
       case e: JsError => successful(BadRequest(JsError.toJson(e)))
+    }
+  }
+
+  /**
+    * Finds and retrieves paged results of all users in workspace.
+    */
+  def findAll: Action[AnyContent] = adminAction.async { request =>
+    implicit val workspace: Workspace = request.workspace
+    implicit val pagination: Pagination = Pagination.fromRequest(request)(OffsetSpecs.MongoOffsetSpec)
+
+    authUserService.findAll map {
+      case p: PagedData[AuthUser] => Ok(Json.toJson(p.toResource))
+      case _ => InternalServerError
     }
   }
 

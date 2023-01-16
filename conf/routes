@@ -28,6 +28,7 @@ POST        /v1/system/workspaces/messaging-test io.xauth.web.controller.system.
 
 # Admin: Users, Clients and Application
 POST        /v1/admin/users                      io.xauth.web.controller.admin.users.AdminUserController.create
+GET         /v1/admin/users                      io.xauth.web.controller.admin.users.AdminUserController.findAll
 GET         /v1/admin/users/:id                  io.xauth.web.controller.admin.users.AdminUserController.find(id: io.xauth.Uuid)
 DELETE      /v1/admin/users/:id                  io.xauth.web.controller.admin.users.AdminUserController.delete(id: io.xauth.Uuid)
 POST        /v1/admin/users/:id/unblock          io.xauth.web.controller.admin.users.AdminUserController.unblock(id: io.xauth.Uuid)

@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import io.xauth.Uuid
 import io.xauth.actor.AccountActivationActor.ActivateUserMessage
 import io.xauth.model.ContactType.Email
+import io.xauth.model.pagination.{PagedData, Pagination}
 import io.xauth.model.{AppInfo, UserInfo}
 import io.xauth.service.auth.model.AuthCodeType.{Activation, ContactTrust}
 import io.xauth.service.auth.model.AuthRole.{AuthRole, User}
@@ -15,7 +16,7 @@ import io.xauth.service.workspace.model.Workspace
 import io.xauth.util.Implicits.FormattedDate
 import play.api.Logger
 import play.api.libs.json.Json
-import reactivemongo.api.{Collation, WriteConcern}
+import reactivemongo.api.{Collation, Cursor, ReadPreference, WriteConcern}
 import reactivemongo.play.json.compat._
 import reactivemongo.play.json.compat.json2bson.toDocumentWriter
 
@@ -28,8 +29,8 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Service that handles the user business logic.
- */
+  * Service that handles the user business logic.
+  */
 @Singleton
 class AuthUserService @Inject()
 (
@@ -42,11 +43,11 @@ class AuthUserService @Inject()
   private val logger: Logger = Logger(this.getClass)
 
   /**
-   * Searches and retrieves user by its username.
-   *
-   * @param username Username.
-   * @return Returns non-empty [[Some(User)]] if the user was found.
-   */
+    * Searches and retrieves user by its username.
+    *
+    * @param username Username.
+    * @return Returns non-empty [[Some(User)]] if the user was found.
+    */
   def findByUsername(username: String)(implicit w: Workspace): Future[Option[AuthUser]] = {
     require(username.nonEmpty, "username must not be null")
 
@@ -55,17 +56,45 @@ class AuthUserService @Inject()
     }
   }
 
+  /**
+    * Find all users and returns paged results.
+    * @param w Current workspace
+    * @param p Pagination rules
+    * @return Returns a future that boxes the paged result user list.
+    */
+  def findAll(implicit w: Workspace, p: Pagination): Future[PagedData[AuthUser]] = {
+    val selector = Json.obj()
+    val collection = mongo.collection(WorkspaceCollection.AuthUser)
+
+    // counting matching documents
+    val count = collection.flatMap(_.count(Some(selector)))
+
+    // fetching matching documents
+    val results = collection flatMap {
+      _
+        .find(Json.obj())
+        .skip(p.offset)
+        .cursor[AuthUser](ReadPreference.primary)
+        .collect[Seq](p.size, Cursor.FailOnError[Seq[AuthUser]]())
+    }
+
+    for {
+      tot <- count
+      users <- results
+    } yield p.paginate(users, tot.toInt)
+  }
+
   def save(username: String, password: String, description: Option[String], userInfo: UserInfo)(implicit w: Workspace): Future[AuthUser] =
     save(username, password, description, userInfo, Disabled, Nil, User)
 
   /**
-   * Creates new user.
-   *
-   * @param username Username.
-   * @param password User password that it will encrypted.
-   * @param userInfo User information.
-   * @return Returns a [[Future]] that boxes just created user.
-   */
+    * Creates new user.
+    *
+    * @param username Username.
+    * @param password User password that it will encrypted.
+    * @param userInfo User information.
+    * @return Returns a [[Future]] that boxes just created user.
+    */
   def save(username: String, password: String, description: Option[String], userInfo: UserInfo, status: AuthStatus, applications: List[AppInfo], roles: AuthRole*)(implicit w: Workspace): Future[AuthUser] = {
     require(username != null, "username must not be null")
     require(password != null, "password must not be null")
@@ -108,12 +137,12 @@ class AuthUserService @Inject()
   }
 
   /**
-   * Deletes user from persistence system.
-   *
-   * @param id User identifier.
-   * @return Returns `true` if the requested user has been deleted,
-   *         returns false otherwise.
-   */
+    * Deletes user from persistence system.
+    *
+    * @param id User identifier.
+    * @return Returns `true` if the requested user has been deleted,
+    *         returns false otherwise.
+    */
   def delete(id: Uuid)(implicit w: Workspace): Future[Boolean] = {
     require(id != null, "id must not be null")
 
@@ -237,12 +266,12 @@ class AuthUserService @Inject()
   }
 
   /**
-   * Searches and retrieves from persistence system the
-   * user referred to the given identifier.
-   *
-   * @param id User identifier.
-   * @return Returns non-empty [[Some(AuthUser)]] if the user was found.
-   */
+    * Searches and retrieves from persistence system the
+    * user referred to the given identifier.
+    *
+    * @param id User identifier.
+    * @return Returns non-empty [[Some(AuthUser)]] if the user was found.
+    */
   def findById(id: Uuid)(implicit w: Workspace): Future[Option[AuthUser]] = {
     require(id != null, "id must not be null")
 
@@ -252,12 +281,12 @@ class AuthUserService @Inject()
   }
 
   /**
-   * Activates the user account by an activation code.
-   *
-   * @param code The activation code.
-   * @return Returns [[Future]] that boxes boolean if the operation has been
-   *         completed without errors, boxes false otherwise.
-   */
+    * Activates the user account by an activation code.
+    *
+    * @param code The activation code.
+    * @return Returns [[Future]] that boxes boolean if the operation has been
+    *         completed without errors, boxes false otherwise.
+    */
   def activate(code: String)(implicit w: Workspace): Future[Boolean] = {
     require(code != null, "code must not be null")
 
@@ -312,10 +341,10 @@ class AuthUserService @Inject()
   }
 
   /**
-   * Trusts the associated user re-sending the activation code.
-   *
-   * @param user Account user.
-   */
+    * Trusts the associated user re-sending the activation code.
+    *
+    * @param user Account user.
+    */
   def trustAccount(user: AuthUser)(implicit w: Workspace): Unit = {
     require(user != null, "user must not be null")
 
@@ -327,12 +356,12 @@ class AuthUserService @Inject()
   }
 
   /**
-   * Trusts the associated user contact by an contact trust code.
-   *
-   * @param code The contact trust code.
-   * @return Returns [[Future]] that boxes boolean if the operation has been
-   *         completed without errors, boxes false otherwise.
-   */
+    * Trusts the associated user contact by an contact trust code.
+    *
+    * @param code The contact trust code.
+    * @return Returns [[Future]] that boxes boolean if the operation has been
+    *         completed without errors, boxes false otherwise.
+    */
   def trustContact(code: String)(implicit w: Workspace): Future[Boolean] = {
     require(code != null, "code must not be null")
 
