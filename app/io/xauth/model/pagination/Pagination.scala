@@ -7,7 +7,7 @@ class Pagination(val page: Int, val size: Int, val offset: Int) {
     PagedData(
       page = page,
       pageSize = size, pageCount = s.size,
-      totalPages = totalCount / size, totalCount = totalCount,
+      totalPages = if (totalCount < size) 1 else Math.round(totalCount / size), totalCount = totalCount,
       elements = s
     )
   }
@@ -21,7 +21,7 @@ object Pagination {
     new Pagination(
       page,
       size,
-      (page - 1) * spec.offset(page)
+      (page - 1) * spec.offset(page) * size
     )
   }
 
