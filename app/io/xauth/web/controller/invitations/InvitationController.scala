@@ -2,6 +2,7 @@ package io.xauth.web.controller.invitations
 
 import io.xauth.model.ContactType.Email
 import io.xauth.model.Permission
+import io.xauth.model.pagination.{OffsetSpecs, PagedData, Pagination}
 import io.xauth.service.auth.model.AuthRole.{HelpDeskOperator, HumanResource, Responsible}
 import io.xauth.service.auth.model.{AuthCode, AuthCodeType}
 import io.xauth.service.auth.{AuthCodeService, AuthUserService}
@@ -12,6 +13,7 @@ import io.xauth.service.workspace.model.Workspace
 import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.controller.invitations.model.InvitationResource
 import io.xauth.web.controller.invitations.model.InvitationResource._
+import io.xauth.web.controller.invitations.model.PagedInvitationRes._
 import io.xauth.{JsonSchemaLoader, Uuid}
 import play.api.Logger
 import play.api.libs.json.Json.{obj, toJson}
@@ -23,7 +25,7 @@ import java.util.Date
 import javax.inject._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 /**
   * Controller that exposes registration invitations routes.
@@ -122,20 +124,13 @@ class InvitationController @Inject()
     */
   def findAll: Action[AnyContent] = hrAction.async { request =>
     implicit val workspace: Workspace = request.workspace
+    implicit val pagination: Pagination = Pagination.fromRequest(request)(OffsetSpecs.MongoOffsetSpec)
 
-    Try(request.queryString("q")) match {
-      case Success(v) if v.size == 1 && v.head.nonEmpty =>
-        invitationService.findByEmail(v.head) flatMap {
-          case Some(i) => successful(Ok(toJson(i)))
-          case _ => authCodeService.find(v.head) flatMap {
-            case Some(c) => invitationService.find(c.referenceId) map {
-              case Some(i) => Ok(toJson(i.toResource))
-              case _ => NotFound
-            }
-            case _ => successful(NotFound(obj("message" -> "invitation code not found")))
-          }
-        }
-      case Failure(_) => successful(BadRequest(obj("message" -> "no valid invitation code in 'q' parameter")))
+    val q: Option[String] = request.getQueryString("q")
+
+    invitationService.findAll(q) map {
+      case p: PagedData[Invitation] => Ok(Json.toJson(p.toResource))
+      case _ => InternalServerError
     }
   }
 
