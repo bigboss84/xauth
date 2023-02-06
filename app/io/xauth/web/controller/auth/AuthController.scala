@@ -7,17 +7,20 @@ import io.xauth.actor.ContactTrustActor.ContactTrustMessage
 import io.xauth.actor.PasswordResetActor.PasswordResetMessage
 import io.xauth.config.ApplicationConfiguration
 import io.xauth.model.ContactType.Email
-import io.xauth.service.auth.model.AuthCodeType
+import io.xauth.model.pagination.{OffsetSpecs, PagedData, Pagination}
 import io.xauth.service.auth.model.AuthStatus.{Blocked, Enabled}
 import io.xauth.service.auth.model.AuthUser.checkWithSalt
+import io.xauth.service.auth.model.{AuthCodeType, AuthUser}
 import io.xauth.service.auth.{AuthAccessAttemptService, AuthCodeService, AuthRefreshTokenService, AuthUserService}
 import io.xauth.service.workspace.model.Workspace
 import io.xauth.util.Implicits._
 import io.xauth.util.JwtService
 import io.xauth.web.action.auth.AuthenticationManager
 import io.xauth.web.action.auth.UserAuthenticationRefiner._
+import io.xauth.web.action.auth.model.UserRequest
 import io.xauth.web.controller.auth.model.TokenStatus.{Invalid, TokenStatus, Valid}
 import io.xauth.web.controller.auth.model._
+import io.xauth.web.controller.users.model.PagedUserRes.PagedUserResConverter
 import io.xauth.web.controller.users.model.UserRes._
 import play.api.Logger
 import play.api.libs.json._
@@ -308,6 +311,16 @@ class AuthController @Inject()
             successful(status(NotFound)(s"reset code '${delete.code}' was not found"))
         }
       case JsError(e) => successful(BadRequest(JsError.toJson(e)))
+    }
+  }
+
+  def children: Action[AnyContent] = auth.UserAction.async { request =>
+    implicit val workspace: Workspace = request.asInstanceOf[UserRequest[_]].workspace
+    implicit val pagination: Pagination = Pagination.fromRequest(request)(OffsetSpecs.MongoOffsetSpec)
+
+    authService.childrenOf(request.authUser.id) map {
+      case p: PagedData[AuthUser] => Ok(Json.toJson(p.toResource))
+      case _ => InternalServerError
     }
   }
 

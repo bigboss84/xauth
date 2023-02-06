@@ -78,6 +78,7 @@ POST        /v1/auth/account-delete-confirmation io.xauth.web.controller.auth.Au
 
 ## token authentication
 GET         /v1/auth/user                        io.xauth.web.controller.auth.AuthController.user
+GET         /v1/auth/children                    io.xauth.web.controller.auth.AuthController.children
 POST        /v1/auth/contact-trust               io.xauth.web.controller.auth.AuthController.contactTrust
 POST        /v1/auth/contact-activation          io.xauth.web.controller.auth.AuthController.contactActivation
 

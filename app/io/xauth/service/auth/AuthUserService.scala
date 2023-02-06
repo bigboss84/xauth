@@ -58,6 +58,7 @@ class AuthUserService @Inject()
 
   /**
     * Find all users and returns paged results.
+    *
     * @param w Current workspace
     * @param p Pagination rules
     * @return Returns a future that boxes the paged result user list.
@@ -264,6 +265,38 @@ class AuthUserService @Inject()
     } yield r.result[AuthUser]
 
     f.map(_.isDefined)
+  }
+
+  /**
+    * Returns a paged list o users that have the parent-child relationship with the given parent.
+    *
+    * @param id The parent's user identifier.
+    * @param w  The workspace in which to do the research.
+    * @param p  The pagination data object.
+    * @return Returns a future that wraps the paged users.
+    */
+  def childrenOf(id: Uuid)(implicit w: Workspace, p: Pagination): Future[PagedData[AuthUser]] = {
+    require(id != null, "id must not be null")
+
+    val selector = Json.obj("parentId" -> id)
+    val collection = mongo.collection(WorkspaceCollection.AuthUser)
+
+    // counting matching documents
+    val count = collection.flatMap(_.count(Some(selector)))
+
+    // fetching matching documents
+    val results = collection flatMap {
+      _
+        .find(selector)
+        .skip(p.offset)
+        .cursor[AuthUser](ReadPreference.primary)
+        .collect[Seq](p.size, Cursor.FailOnError[Seq[AuthUser]]())
+    }
+
+    for {
+      tot <- count
+      users <- results
+    } yield p.paginate(users, tot.toInt)
   }
 
   /**
