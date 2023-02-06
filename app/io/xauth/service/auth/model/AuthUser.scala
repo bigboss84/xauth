@@ -16,6 +16,7 @@ case class AuthUser
   username: String,
   password: String,
   salt: String,
+  parentId: Option[Uuid],
   roles: List[AuthRole],
   applications: List[AppInfo] = Nil,
   status: AuthStatus,
@@ -63,6 +64,7 @@ object AuthUser extends DataFormat {
       and (__ \ "username").read[String]
       and (__ \ "password").read[String]
       and (__ \ "salt").read[String]
+      and (__ \ "parentId").readNullable[Uuid]
       and (__ \ "roles").read[List[AuthRole]]
       and (__ \ "applications").read[List[AppInfo]]
       and (__ \ "status").read[AuthStatus]
@@ -77,6 +79,7 @@ object AuthUser extends DataFormat {
       and (__ \ "username").write[String]
       and (__ \ "password").write[String]
       and (__ \ "salt").write[String]
+      and (__ \ "parentId").writeNullable[Uuid]
       and (__ \ "roles").write[List[AuthRole]]
       and (__ \ "applications").write[List[AppInfo]]
       and (__ \ "status").write[AuthStatus]

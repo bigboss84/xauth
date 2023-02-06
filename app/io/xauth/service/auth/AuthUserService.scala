@@ -84,8 +84,8 @@ class AuthUserService @Inject()
     } yield p.paginate(users, tot.toInt)
   }
 
-  def save(username: String, password: String, description: Option[String], userInfo: UserInfo)(implicit w: Workspace): Future[AuthUser] =
-    save(username, password, description, userInfo, Disabled, Nil, User)
+  def save(username: String, password: String, description: Option[String], parentId: Option[Uuid], userInfo: UserInfo)(implicit w: Workspace): Future[AuthUser] =
+    save(username, password, description, parentId, userInfo, Disabled, Nil, User)
 
   /**
     * Creates new user.
@@ -95,7 +95,7 @@ class AuthUserService @Inject()
     * @param userInfo User information.
     * @return Returns a [[Future]] that boxes just created user.
     */
-  def save(username: String, password: String, description: Option[String], userInfo: UserInfo, status: AuthStatus, applications: List[AppInfo], roles: AuthRole*)(implicit w: Workspace): Future[AuthUser] = {
+  def save(username: String, password: String, description: Option[String], parentId: Option[Uuid], userInfo: UserInfo, status: AuthStatus, applications: List[AppInfo], roles: AuthRole*)(implicit w: Workspace): Future[AuthUser] = {
     require(username != null, "username must not be null")
     require(password != null, "password must not be null")
     require(userInfo != null, "user-info must not be null")
@@ -111,6 +111,7 @@ class AuthUserService @Inject()
       username = username,
       password = encPass._2,
       salt = encPass._1,
+      parentId = parentId,
       roles = roles.toList,
       status = status,
       description = description,

@@ -95,7 +95,7 @@ class AuthController @Inject()
 
                   val tokenRes = TokenRes(
                     JwtService.TokenType,
-                    jwtService.createToken(authUser.id, workspace.id, authUser.roles, apps),
+                    jwtService.createToken(authUser.id, workspace.id, authUser.roles, apps, authUser.parentId),
                     workspace.configuration.jwt.expiration.accessToken,
                     JwtService.createRefreshToken
                   )
@@ -179,7 +179,7 @@ class AuthController @Inject()
                         // generating new access token
                         Ok(Json.toJson(TokenRes(
                           JwtService.TokenType,
-                          jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, apps),
+                          jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, apps, authUser.parentId),
                           workspace.configuration.jwt.expiration.accessToken,
                           authRefreshToken.token
                         )))

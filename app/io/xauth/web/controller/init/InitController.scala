@@ -76,7 +76,7 @@ class InitController @Inject()
                 // configuring client
                 _ <- authClientService.create(o.init.client.id, o.init.client.secret)(w)
                 // configuring system admin user
-                _ <- authUserService.save(email, pass, Some("system administrator"), userInfo, Enabled, Nil, User, Admin, System)(w)
+                _ <- authUserService.save(email, pass, Some("system administrator"), None, userInfo, Enabled, Nil, User, Admin, System)(w)
                 // saving new application state
                 _ <- appSettingService.save(Init, "1")
               } yield Ok

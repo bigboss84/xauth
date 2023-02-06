@@ -32,8 +32,8 @@ object InvitationResource extends DataFormat {
         userInfo = i.userInfo,
         validFrom = i.validFrom,
         validTo = i.validTo,
-        registeredAt = i.registeredAt,
-        updatedAt = i.updatedAt
+        registeredAt = Option(i.registeredAt),
+        updatedAt = Option(i.updatedAt)
       )
     }
   }

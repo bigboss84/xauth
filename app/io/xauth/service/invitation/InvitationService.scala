@@ -7,6 +7,7 @@ import io.xauth.config.ApplicationConfiguration
 import io.xauth.config.InvitationCodeNotification.Auto
 import io.xauth.model.ContactType.Email
 import io.xauth.model.pagination.{PagedData, Pagination}
+import io.xauth.service.auth.model.AuthUser
 import io.xauth.service.invitation.model.Invitation
 import io.xauth.service.mongo.{MongoDbClient, WorkspaceCollection}
 import io.xauth.service.workspace.model.Workspace
@@ -105,7 +106,7 @@ class InvitationService @Inject()
     * @param invitation Invitation object to store.
     * @return Returns a [[Future]] that will boxes the created invitation.
     */
-  def create(invitation: Invitation)(implicit w: Workspace): Future[Invitation] = {
+  def create(invitation: Invitation)(implicit w: Workspace, authUser: AuthUser): Future[Invitation] = {
     require(invitation != null, "invitation must not be null")
 
     // retrieving user information from invitation
@@ -113,8 +114,10 @@ class InvitationService @Inject()
 
     val inv = invitation.copy(
       id = Some(Uuid()),
-      registeredAt = Some(now),
-      updatedAt = Some(now)
+      registeredBy = authUser.id,
+      registeredAt = now,
+      updatedBy = authUser.id,
+      updatedAt = now
     )
 
     val writeRes = mongo.collection(WorkspaceCollection.Invitation) flatMap {

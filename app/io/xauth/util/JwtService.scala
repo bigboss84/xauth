@@ -27,14 +27,23 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class JwtService @Inject()(conf: ApplicationConfiguration) {
 
-  def createToken(userId: Uuid, workspaceId: Uuid, roles: List[AuthRole] = Nil, applications: List[AppInfo] = Nil)(implicit w: Workspace): String = {
+  def createToken(userId: Uuid, workspaceId: Uuid, roles: List[AuthRole] = Nil, applications: List[AppInfo] = Nil, parentId: Option[Uuid])(implicit w: Workspace): String = {
+
+    val seq = Seq(
+      "workspaceId" -> workspaceId.stringValue,
+      "roles" -> roles//,
+      //"applications" -> obj(toJson(applications)).toString
+    )
+
+    val data = parentId.fold(seq) { pid => seq :+ "parentId" -> pid.stringValue }
+
     val timestamp = Instant.now.getEpochSecond
 
     val claim = JwtClaim()
       .by(InetAddress.getLocalHost.getHostName)
       .issuedAt(timestamp)
       .expiresAt(timestamp + w.configuration.jwt.expiration.accessToken)
-      .about(userId.stringValue) + ("workspaceId", workspaceId.stringValue) + ("roles", roles) + obj("applications" -> toJson(applications)).toString
+      .about(userId.stringValue) ++ (data:_*) + obj("applications" -> toJson(applications)).toString
 
     // reading algorithm from workspace configuration
     val wAlg = w.configuration.jwt.encryption.algorithm

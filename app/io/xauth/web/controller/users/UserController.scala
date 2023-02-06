@@ -90,7 +90,7 @@ class UserController @Inject
                       val userInfo = i.userInfo.copy(
                         contacts = usr.userInfo.contacts
                       )
-                      authService.save(username, usr.password, usr.description, userInfo, Disabled, i.applications, User) flatMap {
+                      authService.save(username, usr.password, usr.description, Some(i.registeredBy), userInfo, Disabled, i.applications, User) flatMap {
                         u =>
                           // deleting invitation code
                           authCodeService.delete(authCode.code)

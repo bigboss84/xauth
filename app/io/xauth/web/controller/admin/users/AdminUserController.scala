@@ -67,7 +67,7 @@ class AdminUserController @Inject()
           // check username existence
           authUserService.findByUsername(username) flatMap {
             case Some(_) => successful(BadRequest(obj("message" -> "username already registered")))
-            case _ => authUserService.save(username, usr.password, usr.description, usr.userInfo) flatMap {
+            case _ => authUserService.save(username, usr.password, usr.description, None, usr.userInfo) flatMap {
               u => successful(Created(toJson(u.toResource)))
             }
           }

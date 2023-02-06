@@ -15,7 +15,9 @@ import java.util.Date
  * @param userInfo     Pre-filled user information
  * @param validFrom    If defined specifies the invitation validity start date
  * @param validTo      If defined specifies the invitation validity end date
+ * @param registeredBy Invitation registration author
  * @param registeredAt Invitation registration date
+ * @param updatedBy    Invitation last update user
  * @param updatedAt    Invitation last update date
  */
 case class Invitation
@@ -27,8 +29,10 @@ case class Invitation
   userInfo: UserInfo,
   validFrom: Option[Date] = None,
   validTo: Option[Date] = None,
-  registeredAt: Option[Date] = None,
-  updatedAt: Option[Date] = None
+  registeredBy: Uuid,
+  registeredAt: Date,
+  updatedBy: Uuid,
+  updatedAt: Date,
 )
 
 object Invitation extends DataFormat {
@@ -50,8 +54,10 @@ object Invitation extends DataFormat {
       and (__ \ "userInfo").read[UserInfo]
       and (__ \ "validFrom").readNullable[Date]
       and (__ \ "validTo").readNullable[Date]
-      and (__ \ "registeredAt").readNullable[Date]
-      and (__ \ "updatedAt").readNullable[Date]
+      and (__ \ "registeredBy").read[Uuid]
+      and (__ \ "registeredAt").read[Date]
+      and (__ \ "updatedBy").read[Uuid]
+      and (__ \ "updatedAt").read[Date]
     ) (Invitation.apply _)
 
   implicit val write: Writes[Invitation] = (
@@ -61,8 +67,10 @@ object Invitation extends DataFormat {
       and (__ \ "userInfo").write[UserInfo]
       and (__ \ "validFrom").writeNullable(dateWrites(iso8601DateFormat))
       and (__ \ "validTo").writeNullable(dateWrites(iso8601DateFormat))
-      and (__ \ "registeredAt").writeNullable(dateWrites(iso8601DateFormat))
-      and (__ \ "updatedAt").writeNullable(dateWrites(iso8601DateFormat))
+      and (__ \ "registeredBy").write[Uuid]
+      and (__ \ "registeredAt").write(dateWrites(iso8601DateFormat))
+      and (__ \ "updatedBy").write[Uuid]
+      and (__ \ "updatedAt").write(dateWrites(iso8601DateFormat))
     ) (unlift(Invitation.unapply))
 
   import io.xauth.service.mongo.BsonHandlers._

@@ -231,7 +231,7 @@ class WorkspaceService @Inject()
             company = "this",
             contacts = UserContact(Email, init.admin.username, None, trusted = true) :: Nil
           )
-          authUserService.save(init.admin.username, init.admin.password, Some("workspace administrator"), userInfo, AuthStatus.Enabled, Nil, User, Admin)
+          authUserService.save(init.admin.username, init.admin.password, Some("workspace administrator"), None, userInfo, AuthStatus.Enabled, Nil, User, Admin)
         }
         // updating tenant adding current workspace id
         t <- tenantService.findById(workspace.tenantId)

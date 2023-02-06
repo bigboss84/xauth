@@ -4,7 +4,7 @@ import io.xauth.model.ContactType.Email
 import io.xauth.model.Permission
 import io.xauth.model.pagination.{OffsetSpecs, PagedData, Pagination}
 import io.xauth.service.auth.model.AuthRole.{HelpDeskOperator, HumanResource, Responsible}
-import io.xauth.service.auth.model.{AuthCode, AuthCodeType}
+import io.xauth.service.auth.model.{AuthCode, AuthCodeType, AuthUser}
 import io.xauth.service.auth.{AuthCodeService, AuthUserService}
 import io.xauth.service.invitation.InvitationService
 import io.xauth.service.invitation.model.Invitation
@@ -88,13 +88,21 @@ class InvitationController @Inject()
                       case Some(_) => successful(BadRequest(obj("message" -> s"an existing invitation already corresponds to email '$email'")))
                       case _ =>
 
+                        val now = new Date
+
                         val newInv = Invitation(
                           description = inv.description,
                           applications = inv.applications,
                           userInfo = inv.userInfo,
                           validFrom = inv.validFrom,
                           validTo = inv.validTo,
+                          registeredBy = Uuid.Zero,
+                          registeredAt = now,
+                          updatedBy = Uuid.Zero,
+                          updatedAt = now
                         )
+
+                        implicit val author: AuthUser = request.authUser
 
                         // creating new invitation
                         invitationService.create(newInv) transformWith {
