@@ -179,13 +179,25 @@ class AuthController @Inject()
                       if (authUser.status == Enabled) {
                         // computing all application currently configured in workspace
                         val apps = authUser.applications.filter(a => workspace.configuration.applications.contains(a.name))
-                        // generating new access token
-                        Ok(Json.toJson(TokenRes(
+                        // generating new access and refresh tokens
+                        val tokenRes = TokenRes(
                           JwtService.TokenType,
                           jwtService.createToken(authRefreshToken.userId, workspace.id, authUser.roles, apps, authUser.parentId),
                           workspace.configuration.jwt.expiration.accessToken,
-                          authRefreshToken.token
-                        )))
+                          JwtService.createRefreshToken
+                        )
+
+                        logger.info(s"refreshed access-token: ${tokenRes.accessToken}")
+                        logger.info(s"generated new refresh-token: ${tokenRes.refreshToken}")
+
+                        // saving new refresh token
+                        authRefreshTokenService.save(
+                          tokenRes.refreshToken,
+                          request.credentials.id,
+                          authUser.id
+                        )
+
+                        Ok(Json.toJson(tokenRes))
                       }
                       // user is not enabled
                       else forbidden(s"account is currently '${authUser.status.value}'")
