@@ -12,6 +12,7 @@ class ApplicationConfiguration @Inject()(conf: Configuration) {
 
   // Task
   val taskCodeCleanInterval: Int = conf.get[Int]("task.codeClean.interval")
+  val taskInvitationCleanInterval: Int = conf.get[Int]("task.invitationClean.interval")
   val taskTokenCleanInterval: Int = conf.get[Int]("task.tokenClean.interval")
 
   // Json Web Token

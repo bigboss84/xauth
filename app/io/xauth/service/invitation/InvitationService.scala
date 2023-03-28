@@ -169,4 +169,22 @@ class InvitationService @Inject()
         .map(_.n > 0)
     }
   }
+
+  def deleteAllExpired(implicit w: Workspace): Unit = {
+    val nowDate = LocalDateTime.now
+    val nowInstant = Date.from(nowDate.toInstant(UTC))
+    val oneWeekAgo = nowDate.minusWeeks(1)
+
+    val c0 = Json.obj("registeredAt" -> Json.obj("$lt" -> oneWeekAgo))
+    val c1 = Json.obj("$and" -> Json.arr(
+      "validTo" -> Json.obj("$exists" -> true),
+      "validTo" -> Json.obj("$lt" -> nowInstant)
+    ))
+
+    mongo.collection(WorkspaceCollection.Invitation) flatMap {
+      _.delete(ordered = false)
+        .one(Json.obj("$or" -> Json.arr(c0, c1)))
+        .map(_ => {})
+    }
+  }
 }

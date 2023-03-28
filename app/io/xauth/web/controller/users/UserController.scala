@@ -94,6 +94,9 @@ class UserController @Inject
                         u =>
                           // deleting invitation code
                           authCodeService.delete(authCode.code)
+                          // deleting invitation
+                          i.id.foreach(invitationService.delete)
+                          // returning created user
                           successful(Created(Json.toJson(u.toResource)))
                       }
                     // invitation found

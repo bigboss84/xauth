@@ -8,6 +8,8 @@ import play.api.inject.{SimpleModule, bind}
 class TasksModule extends SimpleModule(
   // cleans expired codes
   bind[CodeCleanTask].toSelf.eagerly,
+  // cleans expired invitations
+  bind[InvitationCleanTask].toSelf.eagerly,
   // cleans expired refresh tokens
   bind[TokenCleanTask].toSelf.eagerly,
 )
