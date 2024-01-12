@@ -28,6 +28,8 @@ libraryDependencies ++= Seq(
   // Http client
   ws,
 
+  filters,
+
   // Play
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
 
