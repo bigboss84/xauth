@@ -5,7 +5,7 @@ organization := "io.xauth"
 organizationName := "X-Auth"
 maintainer := "Enrico Russo <enrico.russo.84@gmail.com>"
 
-version := "2.0.4"
+version := "2.0.5"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
