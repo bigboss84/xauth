@@ -115,14 +115,14 @@ class JwtService @Inject()(conf: ApplicationConfiguration) {
   }
 
   def asymmetricKey(implicit w: Workspace): AsymmetricKey = {
-    val path = conf.jwtSecretKeyPath
+    val path = s"${conf.confPath}/keys"
     val pvtBytes = new File(path, s"${w.id.stringValue}/${w.id.stringValue}-rsa.private.der").bytes
     val pubBytes = new File(path, s"${w.id.stringValue}/${w.id.stringValue}-rsa.public.der").bytes
     AsymmetricKey(w.id.stringValue, pvtBytes, pubBytes)
   }
 
   def symmetricKey(implicit w: Workspace): SymmetricKey = {
-    val path = conf.jwtSecretKeyPath
+    val path = s"${conf.confPath}/keys"
     val key = new File(path, s"${w.id.stringValue}/${w.id.stringValue}-rsa.private.der")
     SymmetricKey(w.id.stringValue, key.bytes)
   }

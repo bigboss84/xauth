@@ -36,13 +36,6 @@ RUN apk update; \
 # Installing required packages to import rds-combined-ca-bundle.pem into keystore
 RUN apk add coreutils openssl perl
 
-# Importing certificates from S3
-#ADD import-rds-certs.sh /
-#RUN chmod +x import-rds-certs.sh; \
-#    JAVA_HOME=/usr/lib/jvm/default-jvm; \
-#    ./import-rds-certs.sh; \
-#    rm import-rds-certs.sh
-
 # Cleaning
 #RUN apk del curl coreutils openssl perl
 
@@ -52,26 +45,31 @@ RUN addgroup -S xauth; \
 
 WORKDIR /home/xauth
 
+# .xauth/
+#    conf/
+#       application.conf
+#    script/
+#       keygen.sh
+#    keys/
+#       000...
+
 # Copyng application files
-RUN mkdir -p .jwt/keys/
-ADD keygen.sh .jwt/keys/
+RUN mkdir -p .$APP_NAME/{conf,keys,script}
+ADD keygen.sh .$APP_NAME/script/
 ADD $APP_ARCHIVE .
 RUN unzip $APP_ARCHIVE
+RUN mv $APP_NAME-$APP_VERSION $APP_NAME
 RUN rm $APP_ARCHIVE
 
 RUN chown xauth:xauth *
 
-ENV APP_DIRECTORY="/home/xauth/$APP_NAME-$APP_VERSION"
+ENV CNF_DIRECTORY="/home/xauth/.$APP_NAME"
+ENV APP_DIRECTORY="/home/xauth/$APP_NAME"
 
 # Importing certificates
 WORKDIR $APP_DIRECTORY
-#ADD rds-combined-ca-bundle.p12 $APP_DIRECTORY/conf
-RUN mkdir script
-ADD import-rds-certs.sh script
-RUN chmod +x script/import-rds-certs.sh
-RUN ./script/import-rds-certs.sh $APP_DIRECTORY/conf
 
 # Launching service
 CMD $APP_DIRECTORY/bin/$APP_NAME \
-    -Dconfig.file=$APP_DIRECTORY/conf/application-$ENVIRONMENT.conf \
+    -Dconfig.file=$CNF_DIRECTORY/conf/application-$ENVIRONMENT.conf \
     -Dplay.http.secret.key=$APP_SECRET

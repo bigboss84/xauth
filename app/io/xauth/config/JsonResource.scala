@@ -14,6 +14,13 @@ class JsonResource[T](resPath: String)
 
   val resourcePath: String = resPath
 
-  val value: T =
-    parse(fromFile(env.getFile(resPath)).getLines().map(_.trim).mkString).as[T]
+  val value: T = {
+    val source = fromFile(env.getFile(resPath))
+
+    try {
+      parse(source.getLines().map(_.trim).mkString).as[T]
+    } finally {
+      source.close()
+    }
+  }
 }

@@ -132,6 +132,7 @@ install := {
       "-a" :: f"${name.value}" ::
       "-v" :: f"${version.value}" ::
       "-e" :: sys.props.getOrElse("environment", "development") ::
-      "-r" :: "527126057281.dkr.ecr.eu-south-1.amazonaws.com" :: Nil
+      "-r" :: "registry.xauth.io" ::
+      "-u" :: "xauth" :: Nil
   ).!
 }

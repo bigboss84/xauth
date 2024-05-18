@@ -79,11 +79,15 @@ class WorkspaceService @Inject()
         .collect[List](-1, Cursor.FailOnError[List[Workspace]]())
     }
 
-  def generateKeyPair(workspaceId: Uuid, keyPath: String): Either[String, Path] = {
+  def generateKeyPair(workspaceId: Uuid, confPath: String): Either[String, Path] = {
     // preparing file-system
-    val keysPath = Paths.get(keyPath)
-    val workspacePath = keysPath.resolve(workspaceId.stringValue)
-    val keygenPath = keysPath.resolve("keygen.sh")
+    val path = Paths.get(confPath)
+    val workspacePath = path
+      .resolve("keys")
+      .resolve(workspaceId.stringValue)
+    val keygenPath = path
+      .resolve("script")
+      .resolve("keygen.sh")
 
     // <key-path>/keys/<workspace-id>/
     Files.createDirectories(workspacePath)
@@ -163,7 +167,7 @@ class WorkspaceService @Inject()
 
     result.map { _ =>
       // generating asymmetric key pair
-      generateKeyPair(workspace.id, configuration.jwtSecretKeyPath) match {
+      generateKeyPair(workspace.id, configuration.confPath) match {
         case Left(e) => logger.error(e)
         case Right(path) => logger.info(s"generated key pair for default system workspace at $path")
       }
@@ -211,7 +215,7 @@ class WorkspaceService @Inject()
     writeRes map { _ =>
 
       // generating asymmetric key pair
-      generateKeyPair(workspace.id, configuration.jwtSecretKeyPath) match {
+      generateKeyPair(workspace.id, configuration.confPath) match {
         case Left(e) => logger.error(e)
         case Right(path) => logger.info(s"generated key pair for new workspace at $path")
       }
@@ -300,7 +304,7 @@ class WorkspaceService @Inject()
     f flatMap {
       case true =>
         // deleting private/public keypair
-        val keysPath = Paths.get(configuration.jwtSecretKeyPath)
+        val keysPath = Paths.get(configuration.confPath, "keys")
         val workspacePath = keysPath.resolve(w.id.stringValue)
 
         // deleting all keys

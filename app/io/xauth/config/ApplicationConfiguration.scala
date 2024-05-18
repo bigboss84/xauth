@@ -9,6 +9,7 @@ import javax.inject.{Inject, Singleton}
 class ApplicationConfiguration @Inject()(conf: Configuration) {
 
   val baseUrl: String = conf.get[String]("baseUrl")
+  val confPath: String = conf.get[String]("confPath")
 
   // Task
   val taskCodeCleanInterval: Int = conf.get[Int]("task.codeClean.interval")
@@ -18,7 +19,6 @@ class ApplicationConfiguration @Inject()(conf: Configuration) {
   // Json Web Token
   val jwtExpirationAccessToken: Int = conf.get[Int]("workspace.jwt.expiration.accessToken")
   val jwtExpirationRefreshToken: Int = conf.get[Int]("workspace.jwt.expiration.refreshToken")
-  val jwtSecretKeyPath: String = conf.get[String]("workspace.jwt.secretKey.path")
   val jwtAlgorithm: String = conf.get[String]("workspace.jwt.secretKey.algorithm")
 
   val mongoDbUri: String = conf.get[String]("mongodb.uri")

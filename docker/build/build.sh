@@ -11,9 +11,10 @@ module_dir=
 artifact=
 version=
 repository=
+username=
 proxy=
 
-while getopts "h?d:a:v:e:r:p:" opt; do
+while getopts "h?d:a:v:e:r:u:p:" opt; do
     case "$opt" in
     h|\?)
         echo "USAGE"
@@ -39,6 +40,9 @@ while getopts "h?d:a:v:e:r:p:" opt; do
     r)  repository=$OPTARG
         printf "       repository: \e[1;37m$repository\e[0m\n"
         ;;
+    u)  username=$OPTARG
+        printf "         username: \e[1;37m$username\e[0m\n"
+        ;;
     p)  proxy=$OPTARG
         printf "            proxy: \e[1;37m$proxy\e[0m\n"
         ;;
@@ -54,18 +58,21 @@ cp $module_dir/target/universal/$artifact-$version.zip $module_dir/docker/build
 printf "\e[1;37m > \e[0mcopying 'keygen.sh'\e[0m\n"
 cp $module_dir/script/keygen.sh $module_dir/docker/build
 
-printf "\e[1;37m > \e[0mcopying 'import-rds-certs.sh'\e[0m\n"
-cp $module_dir/script/import-rds-certs.sh $module_dir/docker/build
+#printf "\e[1;37m > \e[0mcopying 'import-rds-certs.sh'\e[0m\n"
+#cp $module_dir/script/import-rds-certs.sh $module_dir/docker/build
 
 cd $module_dir/docker/build
 
-tag=$environment-$version
+#tag=$environment-$version
+tag=$version
 
 printf "\e[1;37m > \e[0mgenerating application secret\e[0m\n"
 secret=$(openssl rand -hex 32)
 
 printf "\e[1;37m > \e[0mbuilding image '$artifact:$tag'\e[2;49;39m\n"
-docker buildx build --platform linux/arm64 \
+# --platform linux/arm64
+# --platform linux/amd64
+docker buildx build --platform linux/amd64 \
              --build-arg PROXY=$proxy \
              --build-arg ENVIRONMENT=$environment \
              --build-arg APP_NAME=$artifact \
@@ -82,10 +89,15 @@ printf "\e[0m"
 printf "\e[1;37m > \e[0marchitecture $arch\e[2;49;39m\n"
 printf "\e[0m"
 
-printf "\e[1;37m > \e[0msigning-in to aws repository\n"
-login_command=$(aws ecr get-login-password --region eu-south-1)
-echo $login_command | docker login --username AWS --password-stdin $repository &> /dev/null
-printf "\e[0m"
+#printf "\e[1;37m > \e[0msigning-in to aws repository\n"
+#login_command=$(aws ecr get-login-password --region eu-south-1)
+#echo $login_command | docker login --username AWS --password-stdin $repository &> /dev/null
+#printf "\e[0m"
+
+#printf "\e[1;37m > \e[0msigning-in to docker repository: $repository\n"
+#read -p "Password ($username):" -s password
+#echo $password | docker login --username $username --password-stdin $repository &> /dev/null
+#printf "\e[0m"
 
 printf "\e[1;37m > \e[0mpushing image to '$repository/$artifact:$tag'\e[2;49;39m\n"
 docker push $repository/$artifact:$tag
@@ -103,7 +115,7 @@ rm $module_dir/docker/build/$artifact-$version.zip
 printf "\e[1;37m > \e[0mdeleting local 'keygen.sh'\e[0m\n"
 rm $module_dir/docker/build/keygen.sh
 
-printf "\e[1;37m > \e[0mdeleting local 'import-rds-certs.sh'\e[0m\n"
-rm $module_dir/docker/build/import-rds-certs.sh
+#printf "\e[1;37m > \e[0mdeleting local 'import-rds-certs.sh'\e[0m\n"
+#rm $module_dir/docker/build/import-rds-certs.sh
 
 printf '\e[0mdone.\n\n'
