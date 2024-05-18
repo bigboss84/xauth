@@ -52,11 +52,11 @@ class AuthRefreshTokenService @Inject()
   }
 
   def deleteAllExpired(implicit w: Workspace): Unit = {
-    val now = Date.from(LocalDateTime.now.toInstant(UTC))
+    val now = LocalDateTime.now.toInstant(UTC)
 
     mongo.collection(WorkspaceCollection.AuthRefreshToken) flatMap {
       _.delete(ordered = false)
-        .one(Json.obj("expiresAt" -> Json.obj("$lt" -> now)))
+        .one(Json.obj("expiresAt" -> Json.obj("$lt" -> now.toString)))
     }
   }
 
